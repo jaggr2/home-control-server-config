@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:enableMajor"
+  ],
+  "timezone": "Europe/Zurich",
+  "schedule": ["after 2am and before 6am"],
+  "labels": ["dependencies", "docker"],
+  "packageRules": [
+    {
+      "description": "Automerge minor und patch Updates",
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Major Updates benötigen manuelle Genehmigung",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["major-update", "manual-review"]
+    },
+    {
+      "description": "Home Assistant - nur stable releases",
+      "matchPackageNames": ["ghcr.io/home-assistant/home-assistant"],
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
+      "automerge": false
+    },
+    {
+      "description": "FreePBX - konservativ updaten",
+      "matchPackageNames": ["tiredofit/freepbx"],
+      "automerge": false
+    }
+  ],
+  "docker-compose": {
+    "fileMatch": ["docker-compose\\.ya?ml$"]
+  },
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5
+}
