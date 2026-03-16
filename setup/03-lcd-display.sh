@@ -1,64 +1,73 @@
 #!/bin/bash
 set -e
 
-echo "=== 3.2 Zoll TFT LCD Display Setup ==="
+# ============================================================
+# 03-lcd-display.sh - LCD Display Setup (boot.cmd Workaround)
+# Für ODROID N2 wo armbianEnv.txt nicht funktioniert
+# ============================================================
 
-# 1. config.ini bearbeiten für Device Tree Overlay
-CONFIG_FILE="/media/boot/config.ini"
+OVERLAY="${LCD_OVERLAY:-meson-g12b-odroid-n2-spi.dtbo}"
+BOOT_CMD="/boot/boot.cmd"
+BOOT_SCR="/boot/boot.scr"
+OVERLAY_DIR="/boot/dtb/amlogic/overlay"
 
-if [ -f "$CONFIG_FILE" ]; then
-    # Backup erstellen
-    cp "$CONFIG_FILE" "${CONFIG_FILE}.bak"
+echo "=== LCD Display Setup (boot.cmd Methode) ==="
+echo ""
 
-    # overlay_profile auf hktft32 setzen
-    sed -i 's/overlay_profile=.*/overlay_profile=hktft32/' "$CONFIG_FILE"
+# Backup erstellen
+cp "$BOOT_CMD" "${BOOT_CMD}.bak.$(date +%Y%m%d%H%M%S)"
+echo "Backup erstellt: ${BOOT_CMD}.bak.*"
 
-    echo "config.ini aktualisiert - overlay_profile=hktft32"
+# Prüfen ob Overlay existiert
+if [ -f "$OVERLAY_DIR/$OVERLAY" ]; then
+    echo "Overlay gefunden: $OVERLAY_DIR/$OVERLAY"
 else
-    echo "WARNUNG: $CONFIG_FILE nicht gefunden!"
+    echo "WARNUNG: Overlay $OVERLAY nicht gefunden in $OVERLAY_DIR"
+    echo "Verfügbare Overlays:"
+    ls -la "$OVERLAY_DIR"/*.dtbo 2>/dev/null || echo "  (keine)"
 fi
 
-# 2. fbset installieren
-apt install -y fbset
+# Overlay-Laden in boot.cmd einfügen (vor 'booti')
+if ! grep -q "LCD Overlay" "$BOOT_CMD"; then
+    echo "Füge Overlay-Laden zu boot.cmd hinzu..."
 
-# 3. Touchscreen-Modul aus Blacklist entfernen
-BLACKLIST_FILE="/etc/modprobe.d/blacklist-odroid.conf"
-if [ -f "$BLACKLIST_FILE" ]; then
-    sed -i 's/^blacklist ads7846/#blacklist ads7846/' "$BLACKLIST_FILE"
-    echo "ads7846 aus Blacklist entfernt"
+    sed -i '/^booti /i \
+# LCD Overlay laden\
+if test -e \${devtype} \${devnum}:\${distro_bootpart} /dtb/amlogic/overlay/'"$OVERLAY"'; then\
+    echo "Loading LCD overlay..."\
+    load \${devtype} \${devnum}:\${distro_bootpart} \${loadaddr} /dtb/amlogic/overlay/'"$OVERLAY"'\
+    fdt apply \${loadaddr}\
+fi\
+' "$BOOT_CMD"
+
+    echo "boot.cmd modifiziert"
+else
+    echo "LCD Overlay bereits in boot.cmd konfiguriert"
 fi
 
-# 4. X11-Konfiguration für Framebuffer erstellen
-mkdir -p /usr/share/X11/xorg.conf.d
+# boot.scr neu generieren
+echo "Generiere boot.scr..."
+mkimage -C none -A arm64 -T script -d "$BOOT_CMD" "$BOOT_SCR"
 
-cat > /usr/share/X11/xorg.conf.d/99-odroid-lcd.conf << 'XORGEOF'
-Section "Device"
-    Identifier      "FBTURBO"
-    Driver          "fbturbo"
-    Option          "fbdev" "/dev/fb0"
-    Option          "SwapbuffersWait" "true"
-    Option          "alpha_swap" "true"
-EndSection
-XORGEOF
+# fbtft Module konfigurieren
+echo "Konfiguriere Kernel-Module..."
+cat > /etc/modules-load.d/lcd.conf << 'EOF'
+spi-meson-spicc
+spidev
+fbtft
+fb_ili9341
+EOF
 
-# 5. Touchscreen-Kalibrierung vorbereiten
-apt install -y xserver-xorg-input-evdev xinput-calibrator
-
-cat > /usr/share/X11/xorg.conf.d/99-calibration.conf << 'CALIBEOF'
-Section "InputClass"
-    Identifier      "calibration"
-    MatchProduct    "ADS7846 Touchscreen"
-    Driver "evdev"
-EndSection
-CALIBEOF
+# Module-Parameter für ili9341 (3.2" Hardkernel LCD)
+cat > /etc/modprobe.d/fbtft.conf << 'EOF'
+options fbtft_device name=hktft32 busnum=1 rotate=270 speed=32000000
+EOF
 
 echo ""
-echo "=== LCD Setup abgeschlossen ==="
-echo "Bitte System neu starten: sudo reboot"
+echo "=== Setup abgeschlossen ==="
 echo ""
-echo "Nach dem Neustart:"
-echo "1. Framebuffer finden: grep -Hri 'hktft' /sys/class/graphics/fb*/name"
-echo "2. Konsole mappen: sudo con2fbmap 1 0"
-echo "3. Zur Konsole wechseln: sudo chvt 1"
+echo "Nach Neustart prüfen:"
+echo "  dmesg | grep -i 'spi\|fbtft\|ili9341\|fb'"
+echo "  ls -la /dev/fb*"
 echo ""
-echo "Für Touchscreen-Kalibrierung: xinput_calibrator"
+echo "Neustart erforderlich: sudo reboot"
