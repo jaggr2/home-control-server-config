@@ -1,16 +1,17 @@
-hostnamectl set-hostname derog-hc
+# update and install git
 apt update & apt upgrade -y
 apt-get install git
-reboot now
 
-exit 0
-
-##### after reboot, login again and run:
 # generate key pair
 ssh-keygen -t ed25519
 
 # show public key and add to github as deployment key
 cat ~/.ssh/id_ed25519.pub
+
+exit 0
+##################################################################
+################ manual steps from here on: ######################
+##################################################################
 
 # create repository, add deployment key and clone it
 git clone git@github.com:jaggr2/home-control-server-config.git
