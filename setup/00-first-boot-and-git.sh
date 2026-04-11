@@ -4,19 +4,22 @@
 # eMMC in ODROID-N2 einsetzen, booten
 # Standard-Login: root / odroid
 
-# System aktualisieren
+# update system
 apt update && apt upgrade -y
 apt-get install git -y
 
-# Benutzer erstellen
+# create user and add to sudo group
 adduser homecontrol
 usermod -aG sudo homecontrol
 
-# Hostname setzen
+# set hostname
 hostnamectl set-hostname derog-hc
 
-# Zeitzone konfigurieren
+# set timezone
 timedatectl set-timezone Europe/Zurich
+
+# change root password
+passwd
 
 reboot now
 exit 0
@@ -44,6 +47,11 @@ chmod +x setup/*.sh
 ./setup/02-docker.sh
 ./setup/03-lcd-display.sh
 ./setup/04-auto-update-cron.sh
+
+# push changes to github
+git add .
+git commit -m "Initial setup scripts"
+git push origin main
 
 reboot now
 
