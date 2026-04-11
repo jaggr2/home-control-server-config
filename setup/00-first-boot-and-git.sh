@@ -1,8 +1,11 @@
+## HINT: For 3.2 lcd display, use ubuntu 20.04 image from hardkernel, not armbian
+## Download: https://de.eu.odroid.in/ubuntu_20.04lts/n2/
+
 ##################################################################
 ################ manual steps from here on: ######################
 ##################################################################
-# eMMC in ODROID-N2 einsetzen, booten
-# Standard-Login: root / odroid
+# put eMMC into ODROID-N2 and boot
+# default login: root / odroid
 
 # update system
 apt update && apt upgrade -y
