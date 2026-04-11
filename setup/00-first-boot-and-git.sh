@@ -39,6 +39,10 @@ cat ~/.ssh/id_ed25519.pub
 # create repository, add deployment key and clone it
 git clone git@github.com:jaggr2/home-control-server-config.git
 
+# initial git configuration
+git config --global user.name "derog-hc"
+git config --global user.email "EMAIL"
+
 # create service directory structure
 cd ~/home-control-server-config
 # mkdir -p services/{cloudflared,homeassistant,freepbx,nodered}
@@ -56,22 +60,22 @@ git add .
 git commit -m "Initial setup scripts"
 git push origin main
 
-reboot now
+# reboot now
 
-exit 0
-##################################################################
-###### after reboot, login again and run:
-cd ~/home-control-server-config
+# exit 0
+# ##################################################################
+# ###### after reboot, login again and run:
+# cd ~/home-control-server-config
 
-git pull origin main
+# git pull origin main
 
-# Secrets in .env eintragen
-cp .env.example .env
-nano .env
+# # Secrets in .env eintragen
+# cp .env.example .env
+# nano .env
 
-# Container starten
-docker compose up -d
+# # Container starten
+# docker compose up -d
 
-# Status prüfen
-docker compose ps
-docker compose logs -f
+# # Status prüfen
+# docker compose ps
+# docker compose logs -f
