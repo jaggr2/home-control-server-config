@@ -19,11 +19,21 @@ tee /etc/webhookd.env << 'EOF'
 WHD_HOOK_SCRIPTS="/home/homecontrol/home-control-server-config/scripts/"
 WHD_LISTEN_ADDR=:8080
 WHD_PASSWD_FILE="/etc/webhookd.htpasswd"
+WHD_HOOK_TIMEOUT=60
 EOF
 
-# chmod -R 777 /home/homecontrol/home-control-server-config/scripts
-
+# chmod -R +x /home/homecontrol/home-control-server-config/scripts
 
 sudo htpasswd -cB /etc/webhookd.htpasswd github-deploy
 
 sudo service webhookd restart
+
+sudo systemctl edit webhookd
+## Add the following content to override the service configuration
+[Service]
+User=homecontrol
+Group=homecontrol
+
+
+sudo systemctl daemon-reload
+sudo systemctl restart webhookd
