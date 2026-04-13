@@ -1,10 +1,15 @@
 #!/bin/bash
 set -e
 
+RUN_ID="${hook_run_id:-unknown}"
+REPO="${hook_repo:-unknown}"
+COMMIT_SHA="${hook_sha:-unknown}"
 REPO_DIR="/home/homecontrol/home-control-server-config"
 cd "$REPO_DIR"
 
-echo "=== Apply Configuration ==="
+echo "=== Deployment from ${REPO} ==="
+echo "Run ID: ${RUN_ID}"
+echo "Commit: ${COMMIT_SHA}"
 echo "Working directory: $(pwd)"
 echo "Date: $(date)"
 echo ""
