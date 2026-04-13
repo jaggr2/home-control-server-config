@@ -37,4 +37,4 @@ jobs:
             --no-progress-meter \
             --retry 3 \
             --retry-delay 5 \
-            "https://derog-hc-deploy.jaggi.xyz/apply-config.sh"
+            "https://derog-hc-deploy.jaggi.xyz/apply-config.sh?run_id=${{ github.run_id }}"
