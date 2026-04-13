@@ -1,12 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "docker:enableMajor"
-  ],
+  "extends": ["config:recommended", "docker:enableMajor"],
   "timezone": "Europe/Zurich",
   "schedule": ["after 2am and before 6am"],
   "labels": ["dependencies", "docker"],
+  "gitAuthor": "Renovate Bot <jaggr2@users.noreply.github.com>",
+  "managerFilePatterns": {
+    "docker-compose": ["docker-compose\\.ya?ml$"]
+  },
   "packageRules": [
     {
       "description": "Automerge minor und patch Updates",
@@ -33,9 +34,6 @@
       "automerge": false
     }
   ],
-  "docker-compose": {
-    "fileMatch": ["docker-compose\\.ya?ml$"]
-  },
   "prHourlyLimit": 2,
   "prConcurrentLimit": 5
 }
