@@ -13,3 +13,17 @@ EOF
 # Update and install
 apt update
 apt install webhookd
+apt install apache2-utils
+
+tee /etc/webhookd.env << 'EOF'
+WHD_HOOK_SCRIPTS="/home/homecontrol/home-control-server-config/scripts/"
+WHD_LISTEN_ADDR=:8080
+WHD_PASSWD_FILE="/etc/webhookd.htpasswd"
+EOF
+
+# chmod -R 777 /home/homecontrol/home-control-server-config/scripts
+
+
+sudo htpasswd -cB /etc/webhookd.htpasswd github-deploy
+
+sudo service webhookd restart
