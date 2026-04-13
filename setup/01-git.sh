@@ -30,13 +30,14 @@ cd ~/home-control-server-config
 # make all scripts executable
 chmod +x setup/*.sh
 
-./setup/01-git.sh
+# push changes to github
+git add .
+git commit -m "Execute permissions on setup scripts"
+git push origin main
+
+exit 0
+#./setup/01-git.sh
 ./setup/02-docker.sh
 ./setup/03-webhookd.sh
 ./setup/04-auto-update-cron.sh
 ./setup/09-lcd-display.sh
-
-# push changes to github
-git add .
-git commit -m "Initial setup scripts"
-git push origin main
