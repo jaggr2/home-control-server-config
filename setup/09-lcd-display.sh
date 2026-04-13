@@ -5,7 +5,7 @@ set -e
 ## Download: https://de.eu.odroid.in/ubuntu_20.04lts/n2/
 
 # ============================================================
-# 03-lcd-display.sh - 3.2" LCD Display (Hardkernel Ubuntu)
+# 09-lcd-display.sh - 3.2" LCD Display (Hardkernel Ubuntu)
 # ============================================================
 
 CONFIG_FILE="/media/boot/config.ini"
@@ -37,6 +37,9 @@ echo "Overlay-Dateien gefunden: OK"
 # Backup erstellen
 cp "$CONFIG_FILE" "${CONFIG_FILE}.bak.$(date +%Y%m%d%H%M%S)"
 echo "Backup erstellt"
+
+# fbset installieren
+apt install fbset -y
 
 # overlay_profile setzen
 if grep -q "^overlay_profile=" "$CONFIG_FILE"; then
