@@ -1,0 +1,38 @@
+name: Update and Deploy Containers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker-compose.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 0'
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v40.1.0
+        with:
+          configurationFile: renovate.json
+          token: ${{ secrets.RENOVATE_TOKEN }}
+
+  deploy:
+    needs: renovate
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Trigger device update via Cloudflare Tunnel
+        run: |
+          curl -X POST \
+            -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
+            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
+            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+            --fail \
+            --retry 3 \
+            --retry-delay 5 \
+            "https://derog-hc-deploy.jaggi.xyz/apply-config.sh"
