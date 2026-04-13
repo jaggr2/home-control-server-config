@@ -11,73 +11,73 @@ services:
       - homelab
 
   # Home Assistant
-  homeassistant:
-    image: ghcr.io/home-assistant/home-assistant:2026.3.0  # Pinned version
-    container_name: homeassistant
-    restart: unless-stopped
-    privileged: true
-    environment:
-      - TZ=Europe/Zurich
-      - DISABLE_JEMALLOC=true  # Wichtig für ARM64 mit >4K page size
-    volumes:
-      - ./services/homeassistant/config:/config
-      - /run/dbus:/run/dbus:ro
-    network_mode: host
+  # homeassistant:
+  #   image: ghcr.io/home-assistant/home-assistant:2026.3.0  # Pinned version
+  #   container_name: homeassistant
+  #   restart: unless-stopped
+  #   privileged: true
+  #   environment:
+  #     - TZ=Europe/Zurich
+  #     - DISABLE_JEMALLOC=true  # Wichtig für ARM64 mit >4K page size
+  #   volumes:
+  #     - ./services/homeassistant/config:/config
+  #     - /run/dbus:/run/dbus:ro
+  #   network_mode: host
 
-  # FreePBX
-  freepbx:
-    image: tiredofit/freepbx:16-latest  # ARM64 kompatibel
-    container_name: freepbx
-    restart: unless-stopped
-    privileged: true
-    environment:
-      - TZ=Europe/Zurich
-      - DB_HOST=freepbx-db
-      - DB_NAME=asterisk
-      - DB_USER=asterisk
-      - DB_PASS=${FREEPBX_DB_PASS}
-    volumes:
-      - ./services/freepbx/data:/data
-      - ./services/freepbx/logs:/var/log
-      - ./services/freepbx/certs:/certs
-    ports:
-      - "80:80"
-      - "443:443"
-      - "5060:5060/udp"
-      - "5160:5160/udp"
-      - "10000-10100:10000-10100/udp"
-    networks:
-      - homelab
-    depends_on:
-      - freepbx-db
+  # # FreePBX
+  # freepbx:
+  #   image: tiredofit/freepbx:16-latest  # ARM64 kompatibel
+  #   container_name: freepbx
+  #   restart: unless-stopped
+  #   privileged: true
+  #   environment:
+  #     - TZ=Europe/Zurich
+  #     - DB_HOST=freepbx-db
+  #     - DB_NAME=asterisk
+  #     - DB_USER=asterisk
+  #     - DB_PASS=${FREEPBX_DB_PASS}
+  #   volumes:
+  #     - ./services/freepbx/data:/data
+  #     - ./services/freepbx/logs:/var/log
+  #     - ./services/freepbx/certs:/certs
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "5060:5060/udp"
+  #     - "5160:5160/udp"
+  #     - "10000-10100:10000-10100/udp"
+  #   networks:
+  #     - homelab
+  #   depends_on:
+  #     - freepbx-db
 
-  freepbx-db:
-    image: mariadb:10.11
-    container_name: freepbx-db
-    restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD=${FREEPBX_DB_ROOT_PASS}
-      - MYSQL_DATABASE=asterisk
-      - MYSQL_USER=asterisk
-      - MYSQL_PASSWORD=${FREEPBX_DB_PASS}
-    volumes:
-      - ./services/freepbx/db:/var/lib/mysql
-    networks:
-      - homelab
+  # freepbx-db:
+  #   image: mariadb:10.11
+  #   container_name: freepbx-db
+  #   restart: unless-stopped
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=${FREEPBX_DB_ROOT_PASS}
+  #     - MYSQL_DATABASE=asterisk
+  #     - MYSQL_USER=asterisk
+  #     - MYSQL_PASSWORD=${FREEPBX_DB_PASS}
+  #   volumes:
+  #     - ./services/freepbx/db:/var/lib/mysql
+  #   networks:
+  #     - homelab
 
-  # Node-RED
-  nodered:
-    image: nodered/node-red:4.1.6  # Pinned version
-    container_name: nodered
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Zurich
-    volumes:
-      - ./services/nodered:/data
-    ports:
-      - "1880:1880"
-    networks:
-      - homelab
+  # # Node-RED
+  # nodered:
+  #   image: nodered/node-red:4.1.6  # Pinned version
+  #   container_name: nodered
+  #   restart: unless-stopped
+  #   environment:
+  #     - TZ=Europe/Zurich
+  #   volumes:
+  #     - ./services/nodered:/data
+  #   ports:
+  #     - "1880:1880"
+  #   networks:
+  #     - homelab
 
 networks:
   homelab:
