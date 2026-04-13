@@ -36,4 +36,5 @@ docker image prune -f
 
 echo ""
 echo "=== Apply Configuration completed ==="
+echo "docker compose ps:"
 docker compose ps
