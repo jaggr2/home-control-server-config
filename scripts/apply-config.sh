@@ -1,40 +1,39 @@
 #!/bin/bash
 set -e
 
-cd ~/homelab
+REPO_DIR="/home/homecontrol/home-control-server-config"
+cd "$REPO_DIR"
 
-echo "=== Konfiguration anwenden ==="
-echo "Datum: $(date)"
+echo "=== Apply Configuration ==="
+echo "Working directory: $(pwd)"
+echo "Date: $(date)"
+echo ""
 
 # Git-Status prüfen
 if [ -n "$(git status --porcelain)" ]; then
-    echo "WARNUNG: Uncommitted changes vorhanden!"
+    echo "WARNUNG: Uncommitted changes!"
     git status --short
-    read -p "Fortfahren? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
+    exit 1
 fi
 
-# Neueste Änderungen holen
+# fetch new changes and check if local is behind remote
 git fetch origin main
 LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse origin/main)
 
 if [ "$LOCAL" != "$REMOTE" ]; then
-    echo "Neue Änderungen gefunden, pulling..."
+    echo "New changes found, pulling..."
     git pull origin main
 fi
 
-# Docker Compose anwenden
-echo "Container aktualisieren..."
+# apply configuration
+echo "Updating containers..."
 docker compose pull
 docker compose up -d --remove-orphans
 
-# Alte Images aufräumen
+# cleanup old images
 docker image prune -f
 
 echo ""
-echo "=== Anwendung abgeschlossen ==="
+echo "=== Apply Configuration completed ==="
 docker compose ps

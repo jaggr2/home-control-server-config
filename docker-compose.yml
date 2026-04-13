@@ -20,7 +20,7 @@ services:
       - TZ=Europe/Zurich
       - DISABLE_JEMALLOC=true  # Wichtig für ARM64 mit >4K page size
     volumes:
-      - ./services/homeassistant:/config
+      - ./services/homeassistant/config:/config
       - /run/dbus:/run/dbus:ro
     network_mode: host
 
