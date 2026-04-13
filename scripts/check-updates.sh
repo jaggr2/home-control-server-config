@@ -1,7 +1,7 @@
 #!/bin/bash
 # Prüft auf Container-Updates und zeigt Differenzen
 
-cd ~/homelab
+cd ~/home-control-server-config
 
 echo "=== Container Update Check ==="
 echo "Datum: $(date)"

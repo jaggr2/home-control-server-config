@@ -24,6 +24,7 @@ EOF
 
 # chmod -R +x /home/homecontrol/home-control-server-config/scripts
 
+# add password to password manager
 sudo htpasswd -cB /etc/webhookd.htpasswd github-deploy
 
 sudo service webhookd restart

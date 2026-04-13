@@ -26,13 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+    # -H "X-Hook-Mode: buffered" \
       - name: Trigger device update via Cloudflare Tunnel
         run: |
           curl -X POST \
             -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
             -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
             -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
-            -H "X-Hook-Mode: buffered" \
             --fail-with-body \
             --no-progress-meter \
             --retry 3 \

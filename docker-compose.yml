@@ -65,19 +65,19 @@ services:
   #   networks:
   #     - homelab
 
-  # # Node-RED
-  # nodered:
-  #   image: nodered/node-red:4.1.6  # Pinned version
-  #   container_name: nodered
-  #   restart: unless-stopped
-  #   environment:
-  #     - TZ=Europe/Zurich
-  #   volumes:
-  #     - ./services/nodered:/data
-  #   ports:
-  #     - "1880:1880"
-  #   networks:
-  #     - homelab
+  # Node-RED
+  nodered:
+    image: nodered/node-red:4.1.6  # Pinned version
+    container_name: nodered
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Zurich
+    volumes:
+      - ./services/nodered:/data
+    ports:
+      - "1880:1880"
+    networks:
+      - homelab
 
 networks:
   homelab:
