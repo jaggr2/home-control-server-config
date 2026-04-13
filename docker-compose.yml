@@ -11,18 +11,18 @@ services:
       - homelab
 
   # Home Assistant
-  # homeassistant:
-  #   image: ghcr.io/home-assistant/home-assistant:2026.3.0  # Pinned version
-  #   container_name: homeassistant
-  #   restart: unless-stopped
-  #   privileged: true
-  #   environment:
-  #     - TZ=Europe/Zurich
-  #     - DISABLE_JEMALLOC=true  # Wichtig für ARM64 mit >4K page size
-  #   volumes:
-  #     - ./services/homeassistant/config:/config
-  #     - /run/dbus:/run/dbus:ro
-  #   network_mode: host
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:2026.3.0  # Pinned version
+    container_name: homeassistant
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - TZ=Europe/Zurich
+      - DISABLE_JEMALLOC=true  # Wichtig für ARM64 mit >4K page size
+    volumes:
+      - ./services/homeassistant/config:/config
+      - /run/dbus:/run/dbus:ro
+    network_mode: host
 
   # # FreePBX
   # freepbx:
