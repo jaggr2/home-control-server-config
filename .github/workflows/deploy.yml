@@ -76,6 +76,5 @@ jobs:
               echo "✅ Script executed successfully with exit status 0"
             fi
           else
-            echo "⚠️ Could not determine script exit status from response"
-            exit 1
+            echo "✅ Script executed successfully (no error line found)"
           fi

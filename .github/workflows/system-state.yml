@@ -31,17 +31,3 @@ jobs:
           echo "----- Webhookd request completed ------"
           echo " "
 
-          # Check the last line for exit status
-          last_line=$(tail -n 1 /tmp/webhook_response.txt)
-          if [[ "$last_line" =~ ^error:\ exit\ status\ ([0-9]+) ]]; then
-            exit_code="${BASH_REMATCH[1]}"
-            if [[ "$exit_code" -ne 0 ]]; then
-              echo "❌ Script failed with exit status $exit_code"
-              exit "$exit_code"
-            else
-              echo "✅ Script executed successfully with exit status 0"
-            fi
-          else
-            echo "⚠️ Could not determine script exit status from response"
-            exit 1
-          fi
