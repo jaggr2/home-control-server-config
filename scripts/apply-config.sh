@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-RUN_ID="${hook_run_id:-unknown}"
-REPO="${hook_repo:-unknown}"
-COMMIT_SHA="${hook_sha:-unknown}"
+COMMIT_RUN_ID="${run_id:-unknown}"
+COMMIT_REPO="${repo:-unknown}"
+COMMIT_SHA="${sha:-unknown}"
 REPO_DIR="/home/homecontrol/home-control-server-config"
 cd "$REPO_DIR"
 
-echo "=== Deployment from ${REPO} ==="
-echo "Run ID: ${RUN_ID}"
+echo "=== Deployment from ${COMMIT_REPO} ==="
+echo "Run ID: ${COMMIT_RUN_ID}"
 echo "Commit: ${COMMIT_SHA}"
 echo "Working directory: $(pwd)"
 echo "Date: $(date)"
