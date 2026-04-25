@@ -48,15 +48,25 @@ jobs:
             exit 1
           fi
 
-    # -H "X-Hook-Mode: buffered" \
       - name: Trigger device update via Cloudflare Tunnel
         run: |
+          # Stream to both stdout and capture to file
           curl -X POST \
             -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
             -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
             -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
-            --fail-with-body \
             --no-progress-meter \
             --retry 3 \
             --retry-delay 5 \
-            "https://derog-hc-deploy.jaggi.xyz/apply-config.sh?run_id=${{ github.run_id }}&repo=${{ github.repository }}&sha=${{ github.sha }}"
+            "https://derog-hc-deploy.jaggi.xyz/apply-config.sh?run_id=${{ github.run_id }}&repo=${{ github.repository }}&sha=${{ github.sha }}" \
+            | tee /tmp/webhook_response.txt
+
+          # Check the last line for exit status
+          last_line=$(tail -n 1 /tmp/webhook_response.txt)
+          if [[ "$last_line" =~ ^error:\ exit\ status\ ([0-9]+) ]]; then
+            exit_code="${BASH_REMATCH[1]}"
+            if [[ "$exit_code" -ne 0 ]]; then
+              echo "❌ Script failed with exit status $exit_code"
+              exit "$exit_code"
+            fi
+          fi
