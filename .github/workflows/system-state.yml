@@ -1,4 +1,4 @@
-name: Update and Deploy Containers
+name: Get System State
 
 on:
   push:
