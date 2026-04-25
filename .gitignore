@@ -32,10 +32,5 @@ pids
 **/.cache/
 **/tmp/
 
-# Home Assistant spezifisch
-services/homeassistant/.storage/
-services/homeassistant/home-assistant_v2.db*
-services/homeassistant/tts/
-
-# FreePBX Datenbanken
-services/freepbx/db/
+# Exclude services directory (contains sensitive information and is not needed in the repository)
+services/
