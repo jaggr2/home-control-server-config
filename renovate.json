@@ -5,8 +5,8 @@
   "schedule": ["after 2am and before 6am"],
   "labels": ["dependencies", "docker"],
   "gitAuthor": "Renovate Bot <jaggr2@users.noreply.github.com>",
-  "managerFilePatterns": {
-    "docker-compose": ["docker-compose\\.ya?ml$"]
+  "docker-compose": {
+    "managerFilePatterns": ["docker-compose\\.ya?ml$"]
   },
   "packageRules": [
     {
