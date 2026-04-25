@@ -107,6 +107,7 @@ print_memory_info() {
     MEM_USED=$(free -m | awk '/^Mem:/ {print $3}')
     MEM_FREE=$(free -m | awk '/^Mem:/ {print $4}')
     MEM_AVAILABLE=$(free -m | awk '/^Mem:/ {print $7}')
+    MEM_CACHED=$(free -m | awk '/^Mem:/ {print $6}')
     MEM_PERCENT=$((MEM_USED * 100 / MEM_TOTAL))
 
     # Swap stats
@@ -118,22 +119,23 @@ print_memory_info() {
     [ "$MEM_PERCENT" -gt 70 ] && MEM_COLOR=$YELLOW
     [ "$MEM_PERCENT" -gt 90 ] && MEM_COLOR=$RED
 
-    # Progress bar
-    BAR_WIDTH=40
-    FILLED=$((MEM_PERCENT * BAR_WIDTH / 100))
-    EMPTY=$((BAR_WIDTH - FILLED))
-    BAR="${MEM_COLOR}$(printf '█%.0s' $(seq 1 $FILLED 2>/dev/null || echo ""))${NC}$(printf '░%.0s' $(seq 1 $EMPTY 2>/dev/null || echo ""))"
-
     printf "  ${CYAN}%-15s${NC} %sMB / %sMB (${MEM_COLOR}%s%%${NC})\n" "RAM Used:" "$MEM_USED" "$MEM_TOTAL" "$MEM_PERCENT"
     printf "  ${CYAN}%-15s${NC} %sMB\n" "Available:" "$MEM_AVAILABLE"
-    printf "  ${CYAN}%-15s${NC} [%s]\n" "Usage:" "$BAR"
+    printf "  ${CYAN}%-15s${NC} %sMB\n" "Free:" "$MEM_FREE"
+    printf "  ${CYAN}%-15s${NC} %sMB\n" "Cached:" "$MEM_CACHED"
 
     if [ "$SWAP_TOTAL" -gt 0 ]; then
         SWAP_PERCENT=$((SWAP_USED * 100 / SWAP_TOTAL))
-        printf "  ${CYAN}%-15s${NC} %sMB / %sMB (%s%%)\n" "Swap:" "$SWAP_USED" "$SWAP_TOTAL" "$SWAP_PERCENT"
+        SWAP_COLOR=$GREEN
+        [ "$SWAP_PERCENT" -gt 50 ] && SWAP_COLOR=$YELLOW
+        [ "$SWAP_PERCENT" -gt 80 ] && SWAP_COLOR=$RED
+        printf "  ${CYAN}%-15s${NC} %sMB / %sMB (${SWAP_COLOR}%s%%${NC})\n" "Swap:" "$SWAP_USED" "$SWAP_TOTAL" "$SWAP_PERCENT"
+    else
+        printf "  ${CYAN}%-15s${NC} Not configured\n" "Swap:"
     fi
     echo ""
 }
+
 
 # Disk Information
 print_disk_info() {
