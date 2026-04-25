@@ -61,7 +61,8 @@ jobs:
             "https://derog-hc-deploy.jaggi.xyz/apply-config.sh?run_id=${{ github.run_id }}&repo=${{ github.repository }}&sha=${{ github.sha }}" \
             | tee /tmp/webhook_response.txt
 
-          echo "----- Webhook request completed, checking for errors... ------"
+          echo " "
+          echo "----- Webhookd request completed ------"
           echo " "
 
           # Check the last line for exit status
