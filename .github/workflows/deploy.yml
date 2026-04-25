@@ -61,6 +61,9 @@ jobs:
             "https://derog-hc-deploy.jaggi.xyz/apply-config.sh?run_id=${{ github.run_id }}&repo=${{ github.repository }}&sha=${{ github.sha }}" \
             | tee /tmp/webhook_response.txt
 
+          echo "----- Webhook request completed, checking for errors... ------"
+          echo " "
+
           # Check the last line for exit status
           last_line=$(tail -n 1 /tmp/webhook_response.txt)
           if [[ "$last_line" =~ ^error:\ exit\ status\ ([0-9]+) ]]; then
