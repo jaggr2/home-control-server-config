@@ -26,6 +26,28 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Test connection to Cloudflare Tunnel
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            --max-time 10 \
+            -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
+            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
+            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+            -H "X-Hook-Mode: buffered" \
+            "https://derog-hc-deploy.jaggi.xyz/health.sh?run_id=${{ github.run_id }}")
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+
+          if [ "$http_code" -eq 200 ] && [ "$body" = "OK" ]; then
+            echo "✅ Webhookd is healthy"
+          else
+            echo "❌ Health check failed"
+            echo "  Expected: HTTP 200 with body 'OK'"
+            echo "  Got: HTTP $http_code with body '$body'"
+            exit 1
+          fi
+
     # -H "X-Hook-Mode: buffered" \
       - name: Trigger device update via Cloudflare Tunnel
         run: |
