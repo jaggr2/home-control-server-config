@@ -12,7 +12,7 @@ services:
 
   # Home Assistant
   homeassistant:
-    image: ghcr.io/home-assistant/home-assistant:2026.3.0  # Pinned version
+    image: ghcr.io/home-assistant/home-assistant:2026.4.4  # Pinned version
     container_name: homeassistant
     restart: unless-stopped
     privileged: true
