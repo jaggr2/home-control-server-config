@@ -67,7 +67,7 @@ services:
 
   # Node-RED
   nodered:
-    image: nodered/node-red:4.1.6  # Pinned version
+    image: nodered/node-red:4.1.8  # Pinned version
     container_name: nodered
     restart: unless-stopped
     environment:
