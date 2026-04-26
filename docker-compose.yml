@@ -98,7 +98,7 @@ services:
      #- TLS_KEY=key.pem
 
     restart: unless-stopped
-    network_mode: "bridge"
+    # network_mode: "bridge"
     networks:
       - homelab
     depends_on:
