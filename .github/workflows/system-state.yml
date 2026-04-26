@@ -1,10 +1,6 @@
 name: Get System State
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docker-compose.yml'
   workflow_dispatch:
   schedule:
     - cron: '0 2 * * 0'
