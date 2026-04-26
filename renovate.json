@@ -8,19 +8,39 @@
   "docker-compose": {
     "managerFilePatterns": ["docker-compose\\.ya?ml$"]
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track apt package versions",
+      "managerFilePatterns": ["apt-packages\\.txt$"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*depName=(?<depName>[^\\s]+)\\s+registryUrl=(?<registryUrl>[^\\n]+)\\n(?<depName2>[^=]+)=(?<currentValue>[^\\n]+)"
+      ],
+      "matchStringsStrategy": "recursive",
+      "datasourceTemplate": "deb",
+      "versioningTemplate": "deb"
+    }
+  ],
   "packageRules": [
     {
       "description": "Automerge minor und patch Updates",
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true,
       "automergeType": "pr",
-      "automergeStrategy": "squash"
+      "automergeStrategy": "squash",
+      "platformAutomerge": true
     },
     {
       "description": "Major Updates benötigen manuelle Genehmigung",
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "labels": ["major-update", "manual-review"]
+    },
+    {
+      "description": "Apt packages - require approval",
+      "matchDatasources": ["deb"],
+      "dependencyDashboardApproval": true,
+      "labels": ["apt", "system-update"]
     },
     {
       "description": "Home Assistant - nur stable releases",
