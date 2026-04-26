@@ -62,6 +62,10 @@ services:
       - ./services/freepbx/data:/data
       - ./services/freepbx/logs:/var/log
       - ./services/freepbx/www:/var/www/html
+      - type: tmpfs
+        target: /run
+        tmpfs:
+          mode: 1777
      ### Only Enable this option below if you set DB_EMBEDDED=TRUE
      # - ./test/db:/var/lib/mysql
      ### You can drop custom files overtop of the image if you have made modifications to modules/css/whatever - Use with care
