@@ -19,7 +19,7 @@ tee /etc/webhookd.env << 'EOF'
 WHD_HOOK_SCRIPTS="/home/homecontrol/home-control-server-config/scripts/"
 WHD_LISTEN_ADDR=:8080
 WHD_PASSWD_FILE="/etc/webhookd.htpasswd"
-WHD_HOOK_TIMEOUT=60
+WHD_HOOK_TIMEOUT=180
 EOF
 
 # chmod -R +x /home/homecontrol/home-control-server-config/scripts
