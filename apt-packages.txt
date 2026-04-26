@@ -1,1 +1,100 @@
-# empty
+[output truncated]
+
+# renovate: depName=ncurses-term registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+ncurses-term=6.5+20250216-2
+
+# renovate: depName=netplan.io registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+netplan.io=1.1.2-7
+
+# renovate: depName=openssh-server registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+openssh-server=1:10.0p1-7+deb13u2
+
+# renovate: depName=openssl-provider-legacy registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+openssl-provider-legacy=3.5.5-1~deb13u2
+
+# renovate: depName=pahole registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+pahole=1.30-1
+
+# renovate: depName=parted registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+parted=3.6-5
+
+# renovate: depName=passwd registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+passwd=1:4.17.4-2
+
+# renovate: depName=perl-base registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+perl-base=5.40.1-6
+
+# renovate: depName=psmisc registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+psmisc=23.7-2
+
+# renovate: depName=qemu-system registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+qemu-system=1:10.0.8+ds-0+deb13u1+b1
+
+# renovate: depName=qemu-system-arm registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+qemu-system-arm=1:10.0.8+ds-0+deb13u1+b1
+
+# renovate: depName=qemu-utils registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+qemu-utils=1:10.0.8+ds-0+deb13u1+b1
+
+# renovate: depName=rsync registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+rsync=3.4.1+ds1-5+deb13u1
+
+# renovate: depName=rsyslog registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+rsyslog=8.2504.0-1
+
+# renovate: depName=sed registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+sed=4.9-2+b1
+
+# renovate: depName=sudo registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+sudo=1.9.16p2-3+deb13u1
+
+# renovate: depName=systemd-resolved registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+systemd-resolved=257.9-1~deb13u1
+
+# renovate: depName=systemd-timesyncd registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+systemd-timesyncd=257.9-1~deb13u1
+
+# renovate: depName=sysvinit-utils registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+sysvinit-utils=3.14-4
+
+# renovate: depName=tar registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+tar=1.35+dfsg-3.1
+
+# renovate: depName=toilet registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+toilet=0.3-3
+
+# renovate: depName=tzdata registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+tzdata=2026a-0+deb13u1
+
+# renovate: depName=u-boot-tools registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+u-boot-tools=2025.01-3
+
+# renovate: depName=usbutils registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+usbutils=1:018-2
+
+# renovate: depName=util-linux registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+util-linux=2.41-5
+
+# renovate: depName=virtinst registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+virtinst=1:5.0.0-5+deb13u1
+
+# renovate: depName=watchdog registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+watchdog=5.16-1.1
+
+# renovate: depName=webhookd registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+webhookd=1.21.0
+
+# renovate: depName=wget registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+wget=1.25.0-2
+
+# renovate: depName=wireguard-tools registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+wireguard-tools=1.0.20210914-3
+
+# renovate: depName=wireless-regdb registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+wireless-regdb=2026.02.04-1~deb13u1
+
+# renovate: depName=wpasupplicant registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+wpasupplicant=2:2.10-24
+
+# renovate: depName=zlib1g registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=arm64
+zlib1g=1:1.3.dfsg+really1.3.1-1+b1
