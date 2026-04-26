@@ -17,28 +17,28 @@ jobs:
           token: ${{ secrets.RENOVATE_TOKEN }}  # Use token with push access
 
       - name: Capture apt packages from remote server
-        id: capture
         run: |
-          response=$(curl -s -w "\n%{http_code}" \
-            --max-time 60 \
-            -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
-            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
-            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
-            -H "X-Hook-Mode: buffered" \
-            "https://derog-hc-deploy.jaggi.xyz/capture-packages.sh?run_id=${{ github.run_id }}")
+            http_code=$(curl -s -w "%{http_code}" \
+                --max-time 120 \
+                -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
+                -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
+                -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+                -H "X-Hook-Mode: chunked" \
+                -o apt-packages.txt \
+                "https://derog-hc-deploy.jaggi.xyz/capture-packages.sh?run_id=${{ github.run_id }}")
 
-          http_code=$(echo "$response" | tail -n1)
-          body=$(echo "$response" | head -n-1)
+            if [ "$http_code" -ne 200 ]; then
+                echo "❌ Failed to capture packages (HTTP $http_code)"
+                cat apt-packages.txt
+                exit 1
+            fi
 
-          if [ "$http_code" -ne 200 ]; then
-            echo "❌ Failed to capture packages"
-            echo "  HTTP $http_code"
-            echo "  Response: $body"
-            exit 1
-          fi
+            if [ ! -s apt-packages.txt ]; then
+                echo "❌ Empty response"
+                exit 1
+            fi
 
-          echo "✅ Successfully captured packages"
-          echo "$body" > apt-packages.txt
+            echo "✅ Successfully captured $(wc -l < apt-packages.txt) lines"
 
       - name: Check for changes
         id: changes
