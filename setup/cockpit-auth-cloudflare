@@ -1,0 +1,259 @@
+#!/usr/bin/env python3
+"""
+Cockpit authentication command for Cloudflare Access JWT validation.
+Reads JWT directly from Cf-Access-Jwt-Assertion header - NO Worker required.
+
+Reads configuration from /home/homecontrol/home-control-server-config/.env
+"""
+
+import sys
+import os
+import json
+import base64
+import time
+import urllib.request
+import ssl
+
+# ============================================================
+# CONFIGURATION - Load from .env file
+# ============================================================
+ENV_FILE = "/home/homecontrol/home-control-server-config/.env"
+
+def load_env():
+    """Load configuration from .env file."""
+    config = {}
+    try:
+        with open(ENV_FILE, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "#" in line:
+                    line = line.split("#")[0].strip()
+                if "=" in line:
+                    key, value = line.split("=", 1)
+                    key = key.strip()
+                    value = value.strip()
+                    if (value.startswith('"') and value.endswith('"')) or \
+                       (value.startswith("'") and value.endswith("'")):
+                        value = value[1:-1]
+                    config[key] = value
+    except FileNotFoundError:
+        log(f"ERROR: .env file not found at {ENV_FILE}")
+        sys.exit(1)
+    except Exception as e:
+        log(f"ERROR: Failed to read .env file: {e}")
+        sys.exit(1)
+    return config
+
+ENV = load_env()
+
+CLOUDFLARE_TEAM_NAME = ENV.get("CLOUDFLARE_TEAM_NAME", "")
+CLOUDFLARE_AUD = ENV.get("CLOUDFLARE_AUD", "")
+COCKPIT_USER = ENV.get("COCKPIT_USER", "cockpit-shared")
+
+if not CLOUDFLARE_TEAM_NAME or not CLOUDFLARE_AUD:
+    print("[cockpit-auth-cloudflare] ERROR: CLOUDFLARE_TEAM_NAME and CLOUDFLARE_AUD must be set in .env", file=sys.stderr)
+    sys.exit(1)
+
+CERTS_URL = f"https://{CLOUDFLARE_TEAM_NAME}.cloudflareaccess.com/cdn-cgi/access/certs"
+ISSUER = f"https://{CLOUDFLARE_TEAM_NAME}.cloudflareaccess.com"
+
+
+def log(message):
+    """Log to stderr for debugging."""
+    print(f"[cockpit-auth-cloudflare] {message}", file=sys.stderr)
+
+
+def send_message(msg):
+    """Send a JSON message to cockpit-ws via stdout."""
+    text = json.dumps(msg)
+    os.write(1, f"{len(text)}\n{text}".encode())
+
+
+def read_message():
+    """Read a JSON message from cockpit-ws via stdin."""
+    line = b""
+    while True:
+        char = os.read(0, 1)
+        if char == b"\n":
+            break
+        if not char:
+            return None
+        line += char
+
+    try:
+        length = int(line.decode().strip())
+    except ValueError:
+        return None
+
+    data = b""
+    while len(data) < length:
+        chunk = os.read(0, length - len(data))
+        if not chunk:
+            return None
+        data += chunk
+
+    return json.loads(data.decode())
+
+
+def send_error(problem, message=None):
+    """Send an authentication error and exit."""
+    error = {"command": "init", "problem": problem}
+    if message:
+        error["message"] = message
+    send_message(error)
+    sys.exit(1)
+
+
+def send_init_success(user):
+    """Send successful init and start bridge."""
+    # Find cockpit-bridge
+    bridge_path = "/usr/bin/cockpit-bridge"
+    for path in ["/usr/libexec/cockpit-bridge", "/usr/lib/cockpit/cockpit-bridge"]:
+        if os.path.exists(path):
+            bridge_path = path
+            break
+
+    # Replace process with cockpit-bridge running as the target user
+    os.execlp("runuser", "runuser", "-u", user, "--", bridge_path)
+
+
+def base64url_decode(data):
+    """Decode base64url encoded data."""
+    padding = 4 - len(data) % 4
+    if padding != 4:
+        data += "=" * padding
+    return base64.urlsafe_b64decode(data)
+
+
+def fetch_public_keys():
+    """Fetch Cloudflare Access public keys."""
+    try:
+        ctx = ssl.create_default_context()
+        with urllib.request.urlopen(CERTS_URL, timeout=10, context=ctx) as response:
+            data = json.loads(response.read().decode())
+            return data.get("keys", [])
+    except Exception as e:
+        log(f"Failed to fetch public keys: {e}")
+        return None
+
+
+def verify_jwt(token, keys):
+    """
+    Verify JWT signature using Cloudflare's public keys.
+    Uses PyJWT if available, otherwise falls back to basic validation.
+    """
+    try:
+        import jwt
+        from jwt import PyJWKClient
+
+        jwks_client = PyJWKClient(CERTS_URL)
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
+
+        decoded = jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=CLOUDFLARE_AUD,
+            issuer=ISSUER,
+        )
+        return decoded
+
+    except ImportError:
+        log("PyJWT not installed, performing basic validation only")
+        parts = token.split(".")
+        if len(parts) != 3:
+            return None
+
+        try:
+            payload = json.loads(base64url_decode(parts[1]))
+        except Exception:
+            return None
+
+        now = int(time.time())
+
+        if payload.get("exp", 0) < now:
+            log("Token expired")
+            return None
+
+        if payload.get("nbf", 0) > now:
+            log("Token not yet valid")
+            return None
+
+        if payload.get("iss") != ISSUER:
+            log(f"Invalid issuer: {payload.get('iss')}")
+            return None
+
+        aud = payload.get("aud", [])
+        if isinstance(aud, str):
+            aud = [aud]
+        if CLOUDFLARE_AUD not in aud:
+            log(f"Invalid audience: {aud}")
+            return None
+
+        log("WARNING: Signature not verified (install PyJWT for full security)")
+        return payload
+
+    except Exception as e:
+        log(f"JWT verification failed: {e}")
+        return None
+
+
+def main():
+    host = sys.argv[1] if len(sys.argv) > 1 else "localhost"
+    log(f"Authentication request for host: {host}")
+    log(f"Using config: team={CLOUDFLARE_TEAM_NAME}, user={COCKPIT_USER}")
+
+    # Request the headers from cockpit-ws
+    # We ask for "X-Conversation" which triggers cockpit to send us request info
+    send_message({
+        "command": "authorize",
+        "cookie": "cloudflare-auth",
+        "challenge": "X-Cf-Access-Jwt-Assertion"
+    })
+
+    response = read_message()
+
+    if not response:
+        send_error("authentication-failed", "No response from cockpit-ws")
+
+    if response.get("command") != "authorize":
+        send_error("authentication-failed", "Unexpected response")
+
+    # The response field contains the header value
+    auth_response = response.get("response", "")
+    remote_peer = response.get("remote-peer", "unknown")
+    log(f"Auth request from: {remote_peer}")
+
+    # Extract token - handle both raw JWT and "Bearer <jwt>" format
+    token = auth_response
+    if auth_response.startswith("Bearer "):
+        token = auth_response[7:]
+
+    if not token:
+        send_error("authentication-failed", "No Cloudflare Access JWT found")
+
+    # Fetch Cloudflare public keys
+    keys = fetch_public_keys()
+    if keys is None:
+        send_error("authentication-unavailable", "Cannot fetch Cloudflare keys")
+
+    # Verify the JWT
+    payload = verify_jwt(token, keys)
+
+    if not payload:
+        send_error("authentication-failed", "Invalid or expired token")
+
+    log(f"Authenticated as user: {COCKPIT_USER} (email: {payload.get('email', 'N/A')})")
+
+    # Start cockpit-bridge as the authenticated user
+    send_init_success(COCKPIT_USER)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        log(f"Unexpected error: {e}")
+        send_error("internal-error", str(e))
