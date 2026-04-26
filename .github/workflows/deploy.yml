@@ -78,6 +78,10 @@ jobs:
             else
               echo "✅ Script executed successfully with exit status 0"
             fi
+          elif [[ "$last_line" =~ ^error:\ signal:\ (.+) ]]; then
+            signal_name="${BASH_REMATCH[1]}"
+            echo "❌ Script was terminated by signal: $signal_name"
+            exit 137  # Standard exit code for SIGKILL (128 + 9)
           else
             echo "✅ Script executed successfully (no error line found)"
           fi
