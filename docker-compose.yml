@@ -22,6 +22,11 @@ services:
     volumes:
       - ./services/homeassistant/config:/config
       - /run/dbus:/run/dbus:ro
+      - /dev/serial/by-id:/dev/serial/by-id  # Allows HA to see all serial devices
+    devices:
+      # - /dev/ttyUSB0:/dev/ttyUSB0   # Simple mapping
+      # OR use persistent by-id path (recommended):
+      - /dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus-if00-port0:/dev/ttyUSB0
     network_mode: host
 
   # FreePBX
