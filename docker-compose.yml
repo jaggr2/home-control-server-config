@@ -9,6 +9,8 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     networks:
       - homelab
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # Home Assistant
   homeassistant:
