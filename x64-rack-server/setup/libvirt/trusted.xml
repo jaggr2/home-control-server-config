@@ -3,6 +3,6 @@
   <forward mode='bridge'/>
   <bridge name='br0'/>
   <vlan>
-    <tag id='1'/>
+    <tag id='1' nativeMode='untagged'/>
   </vlan>
 </network>

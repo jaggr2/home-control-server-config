@@ -139,12 +139,17 @@ else
 
     if [ ! -f "${HA_VM_DIR}/haos.qcow2" ]; then
         cd /tmp
-        curl -fLO --progress-bar "${LATEST_URL}"
-        curl -fLO "${SHA_URL}"
-        sha256sum -c "${FILE_NAME}.sha256" || echo "WARNING: checksum failed, verify manually"
-        xz -d "${FILE_NAME}"
+        # Download + optional checksum. HA OS releases have no .sha256 asset,
+        # so skip checksum silently if the file isn't published.
+        curl -fL --progress-bar -o "${FILE_NAME}" "${LATEST_URL}"
+        if curl -fsSL -o "${FILE_NAME}.sha256" "${LATEST_URL}.sha256" 2>/dev/null; then
+            sha256sum -c "${FILE_NAME}.sha256" || echo "WARNING: checksum failed, verify manually"
+            rm -f "${FILE_NAME}.sha256"
+        else
+            echo "  (no checksum asset published — skipping verify)"
+        fi
+        xz -d -k "${FILE_NAME}"
         mv "${FILE_NAME%.xz}" "${HA_VM_DIR}/haos.qcow2"
-        rm -f "${FILE_NAME}.sha256"
         echo "  Image saved to ${HA_VM_DIR}/haos.qcow2"
     else
         echo "  Image already exists."

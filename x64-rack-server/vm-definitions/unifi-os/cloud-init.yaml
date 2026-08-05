@@ -90,7 +90,7 @@ write_files:
 
 runcmd:
   - systemctl enable --now qemu-guest-agent
-  - echo "UniFi OS VM ready. Run: /usr/local/bin/install-unifi.sh <installer_url>"
-  - echo "Setup date: $(date)" > /etc/vm-deploy-date
+  - ['sh', '-c', 'echo "UniFi OS VM ready. Run: /usr/local/bin/install-unifi.sh <installer_url>"']
+  - ['sh', '-c', 'echo "Setup date: $(date)" > /etc/vm-deploy-date']
 
 final_message: "UniFi OS VM booted. SSH in as homelab, then run /usr/local/bin/install-unifi.sh"
