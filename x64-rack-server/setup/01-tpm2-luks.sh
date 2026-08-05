@@ -9,7 +9,12 @@ set -euo pipefail
 # ============================================================
 echo "=== Installing TPM2/clevis tools ==="
 sudo apt-get update -qq
-sudo apt-get install -y -qq tpm2-tools clevis-tpm2 clevis-initramfs systemd-cryptenroll
+sudo apt-get install -y -qq tpm2-tools clevis-tpm2 clevis-initramfs
+# systemd-cryptenroll ships with systemd itself
+if ! command -v systemd-cryptenroll &>/dev/null; then
+    echo "  systemd-cryptenroll missing — installing systemd..."
+    sudo apt-get install -y -qq systemd
+fi
 
 # ============================================================
 # 2. Detect the LUKS root device
