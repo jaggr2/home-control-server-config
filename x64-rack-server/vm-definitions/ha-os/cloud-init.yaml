@@ -3,13 +3,13 @@
 #
 # HA OS ships as a pre-built QCOW2 appliance — cloud-init is not supported.
 # This file serves as documentation for the virt-install command used in
-# setup/05-vm-create.sh.
+# setup/07-vm-create.sh.
 #
 # Image source: https://github.com/home-assistant/operating-system/releases
 # Download:     haos_ova-*.qcow2.xz (latest stable)
 # Docs:         https://www.home-assistant.io/installation/linux
 
-# Virt-install reference (executed by setup/05-vm-create.sh):
+# Virt-install reference (executed by setup/07-vm-create.sh):
 #
 #   virt-install \
 #     --name ha-os \

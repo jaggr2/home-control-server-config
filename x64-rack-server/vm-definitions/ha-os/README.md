@@ -2,13 +2,13 @@
 
 ## Prerequisites
 
-- KVM/libvirt installed (setup/01-kvm-networking.sh)
+- KVM/libvirt installed (setup/03-kvm-networking.sh)
 - VLAN-aware bridge br0 configured
 - Internet access to download image
 
 ## Initial Setup
 
-Run `setup/05-vm-create.sh` which will:
+Run `setup/07-vm-create.sh` which will:
 
 1. Download the latest HA OS QCOW2 image from GitHub releases
 2. Verify the SHA256 checksum
@@ -76,5 +76,5 @@ To rebuild HA OS VM:
 ```bash
 virsh destroy ha-os
 virsh undefine ha-os --remove-all-storage
-# Then re-run setup/05-vm-create.sh
+# Then re-run setup/07-vm-create.sh
 ```

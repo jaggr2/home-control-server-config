@@ -68,6 +68,41 @@ apply-config.sh (git pull → daemon-reload → restart)
 | T2 | Udev-triggered external USB | Monthly | 5TB disk (tresor) |
 | T3 | rclone encrypted | Weekly Sun 4am | Cloud offsite |
 
+## Rack Server Setup Order
+
+Run on a fresh Debian 13 netinst (as the primary user):
+
+```bash
+cd /opt/homelab/x64-rack-server/setup
+
+./00-system-base.sh <user> <hostname> <ip/24> <gateway> <dns1> <dns2> <iface>
+#       -> sudo, packages, static IP, SSH hardening, UFW (apply network, then reboot)
+
+./01-tpm2-luks.sh
+#       -> TPM2 auto-unlock for encrypted root (REQUIRED before rebooting after base)
+
+./02-zfs.sh
+#       -> install ZFS (headers+DKMS), import pool, create datasets
+
+./03-kvm-networking.sh <iface>
+#       -> KVM/libvirt + VLAN-aware bridge br0 (trusted/mgmt/iot/ai)
+
+./04-podman-install.sh
+#       -> podman + rootless lingering + auto-update timer
+
+./05-webhookd.sh
+#       -> webhookd for GitHub Actions CI/CD triggers
+
+./06-quadlet-deploy.sh
+#       -> symlink quadlets + start all containers
+
+./07-vm-create.sh
+#       -> UniFi OS + HA OS VMs (needs installer URL for UniFi)
+
+./08-backup-setup.sh
+#       -> 3-tier backup (ZFS sync + udev USB + rclone)
+```
+
 ## License
 
 See file LICENSE
