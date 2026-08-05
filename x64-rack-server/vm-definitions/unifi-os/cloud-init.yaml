@@ -11,8 +11,9 @@ users:
     groups: sudo
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
-    lock_passwd: false
-    passwd: $6$changeme  # Generate: mkpasswd --method=SHA-512
+    lock_passwd: true
+    ssh_authorized_keys:
+      - # inject via 07-vm-create.sh
 
 ssh_pwauth: false
 disable_root: true

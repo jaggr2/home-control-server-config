@@ -41,6 +41,20 @@ fi
 if virsh dominfo "${UNIFI_NAME}" &>/dev/null; then
     echo "VM ${UNIFI_NAME} already exists. Skipping."
 else
+    echo "Downloading Ubuntu 24.04 cloud image..."
+    UBUNTU_IMG="https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+    UBUNTU_QCW2="/tmp/noble-server-cloudimg-amd64.img"
+
+    if [ ! -f "${UNIFI_VM_DIR}/os.qcow2" ]; then
+        cd /tmp
+        curl -fL --progress-bar -o "${UBUNTU_QCW2}" "${UBUNTU_IMG}"
+        # Resize to 32G
+        qemu-img create -f qcow2 -b "${UBUNTU_QCW2}" -F qcow2 "${UNIFI_VM_DIR}/os.qcow2" 32G
+        echo "  Ubuntu cloud image prepared at ${UNIFI_VM_DIR}/os.qcow2"
+    else
+        echo "  Disk image already exists."
+    fi
+
     echo "Creating cloud-init seed image..."
 
     # Prepare a temporary cloud-init config with the SSH key injected
@@ -48,15 +62,10 @@ else
     cp "$CLOUD_INIT" "$CLOUD_TMP"
 
     if [ -n "$SSH_PUBKEY" ]; then
-        sed -i "s|# ssh_authorized_keys:|ssh_authorized_keys:\n      - ${SSH_PUBKEY}|" "$CLOUD_TMP"
+        sed -i "s|      - # inject via 07-vm-create.sh|      - ${SSH_PUBKEY}|" "$CLOUD_TMP"
+    else
+        echo "WARNING: No SSH key set — VM will only be accessible via console."
     fi
-
-    # Generate password hash for the homelab user
-    echo "Enter password for homelab user (will be hashed):"
-    read -rs HOMELAB_PASS
-    HASHED_PASS=$(mkpasswd --method=SHA-512 "$HOMELAB_PASS" 2>/dev/null || \
-        python3 -c "import crypt; print(crypt.crypt('$HOMELAB_PASS', crypt.mksalt(crypt.METHOD_SHA512)))")
-    sed -i "s|\$6\$changeme|${HASHED_PASS}|" "$CLOUD_TMP"
 
     echo ""
     echo "Creating VM..."
@@ -64,12 +73,12 @@ else
         --name "${UNIFI_NAME}" \
         --memory 2048 \
         --vcpus 2 \
-        --disk "path=${UNIFI_VM_DIR}/os.qcow2,size=32,format=qcow2,bus=virtio" \
+        --disk "path=${UNIFI_VM_DIR}/os.qcow2,format=qcow2,bus=virtio" \
         --network bridge:br0.1,model=virtio \
         --graphics none \
         --console pty,target_type=serial \
         --os-variant ubuntu24.04 \
-        --location "https://releases.ubuntu.com/24.04.4/ubuntu-24.04.4-live-server-amd64.iso" \
+        --import \
         --cloud-init user-data="$CLOUD_TMP" \
         --noautoconsole
 
