@@ -51,8 +51,11 @@ apply-config.sh (git pull → daemon-reload → restart)
 | Radarr | Movie automation |
 | Prowlarr | Indexer management |
 | SABnzbd | Usenet downloader |
-| Cloudflared | Cloudflare Tunnel |
 | Samba | SMB file sharing |
+
+> **Non-container exception**: **Cloudflared** runs as a native apt/systemd service
+> (`setup/cloudflared-setup.sh`) because its sd_notify behavior is incompatible with
+> rootless podman quadlets. This is the *only* non-container service on the host.
 
 ### KVM Virtual Machines
 | VM | Purpose | vCPU/RAM | VLAN |
@@ -95,6 +98,9 @@ cd /opt/homelab/x64-rack-server/setup
 
 ./06-quadlet-deploy.sh
 #       -> symlink quadlets + start all containers
+
+./cloudflared-setup.sh
+#       -> cloudflared via apt (native systemd service — the only non-container exception)
 
 ./07-vm-create.sh
 #       -> UniFi OS + HA OS VMs (needs installer URL for UniFi)

@@ -9,7 +9,7 @@ SYSTEMD_DIR="/home/${USERNAME}/.config/containers/systemd"
 CONFIG_DIR="/home/${USERNAME}/config"
 
 echo "=== Creating config directories ==="
-for svc in sabnzbd sonarr radarr prowlarr plex cloudflared; do
+for svc in sabnzbd sonarr radarr prowlarr plex; do
     mkdir -p "${CONFIG_DIR}/${svc}"
     chown -R "${USERNAME}:${USERNAME}" "${CONFIG_DIR}/${svc}"
 done
@@ -40,7 +40,7 @@ su - "${USERNAME}" -c "systemctl --user daemon-reload"
 echo "=== Starting all services ==="
 su - "${USERNAME}" -c "systemctl --user start arr.network" || true
 
-SERVICES=(sabnzbd sonarr radarr prowlarr plex cloudflared samba)
+SERVICES=(sabnzbd sonarr radarr prowlarr plex samba)
 for svc in "${SERVICES[@]}"; do
     echo "Starting ${svc}..."
     su - "${USERNAME}" -c "systemctl --user start ${svc}.service" || echo "  Warning: ${svc} may need configuration"

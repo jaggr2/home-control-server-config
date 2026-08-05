@@ -47,3 +47,6 @@ podman=5.4.1-1
 
 # renovate: depName=samba registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
 # samba
+
+# renovate: depName=cloudflared registryUrl=https://pkg.cloudflare.com/cloudflared?suite=bookworm&components=main&binaryArch=amd64
+# cloudflared (native apt exception — see setup/cloudflared-setup.sh)
