@@ -1,14 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "docker:enableMajor"],
+  "extends": ["config:recommended"],
   "timezone": "Europe/Zurich",
   "schedule": ["after 2am and before 6am"],
-  "labels": ["dependencies", "docker"],
+  "labels": ["dependencies", "x64-rack-server"],
   "gitAuthor": "Renovate Bot <jaggr2@users.noreply.github.com>",
-  "docker-compose": {
-    "managerFilePatterns": ["docker-compose\\.ya?ml$"]
-  },
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5,
   "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track Quadlet container image versions",
+      "managerFilePatterns": ["quadlets/.*\\.container$"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*depName=(?<depName>\\S+)\\s*datasource=(?<datasource>\\S+)\\nImage=\\S+:(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "{{{datasource}}}"
+    },
     {
       "customType": "regex",
       "description": "Track apt package versions",
@@ -23,7 +31,7 @@
   ],
   "packageRules": [
     {
-      "description": "Automerge minor und patch Updates",
+      "description": "Automerge minor and patch updates",
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true,
       "automergeType": "pr",
@@ -31,29 +39,28 @@
       "platformAutomerge": true
     },
     {
-      "description": "Major Updates benötigen manuelle Genehmigung",
+      "description": "Major updates require manual approval",
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "labels": ["major-update", "manual-review"]
     },
     {
-      "description": "Apt packages - require approval",
+      "description": "Apt packages require approval",
       "matchDatasources": ["deb"],
       "dependencyDashboardApproval": true,
       "labels": ["apt", "system-update"]
     },
     {
-      "description": "Home Assistant - nur stable releases",
-      "matchPackageNames": ["ghcr.io/home-assistant/home-assistant"],
-      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
-      "automerge": false
+      "description": "Plex updates require manual approval",
+      "matchPackageNames": ["linuxserver/plex"],
+      "automerge": false,
+      "labels": ["manual-review"]
     },
     {
-      "description": "FreePBX - konservativ updaten",
-      "matchPackageNames": ["tiredofit/freepbx"],
-      "automerge": false
+      "description": "Cloudflared updates require manual approval",
+      "matchPackageNames": ["cloudflare/cloudflared"],
+      "automerge": false,
+      "labels": ["manual-review"]
     }
-  ],
-  "prHourlyLimit": 2,
-  "prConcurrentLimit": 5
+  ]
 }

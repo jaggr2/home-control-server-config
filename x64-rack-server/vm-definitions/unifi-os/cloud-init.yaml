@@ -1,0 +1,95 @@
+#cloud-config
+# UniFi OS Server VM — Ubuntu 24.04 + podman + UniFi OS Server installer
+# Access after setup: https://<ip>:11443
+
+hostname: unifi-os
+manage_etc_hosts: true
+timezone: Europe/Zurich
+
+users:
+  - name: homelab
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: false
+    passwd: $6$changeme  # Generate: mkpasswd --method=SHA-512
+
+ssh_pwauth: false
+disable_root: true
+
+packages:
+  - podman
+  - slirp4netns
+  - curl
+  - wget
+  - openssh-server
+  - qemu-guest-agent
+  - htop
+  - vim
+
+package_update: true
+package_upgrade: true
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/99-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      X11Forwarding no
+    permissions: "0644"
+
+  - path: /usr/local/bin/install-unifi.sh
+    content: |
+      #!/bin/bash
+      # Install UniFi OS Server on Ubuntu 24.04
+      set -euo pipefail
+
+      echo "=== Installing UniFi OS Server ==="
+
+      # Download current installer from Ubiquiti
+      # Get URL from: https://ui.com/download/software/unifi-os-server
+      INSTALLER_URL="${1}"
+
+      if [ -z "$INSTALLER_URL" ]; then
+          echo "Usage: $0 <installer_download_url>"
+          echo "Get the URL from: https://ui.com/download/software/unifi-os-server"
+          echo "Right-click Linux (x64) → Copy link address"
+          exit 1
+      fi
+
+      cd /tmp
+      echo "Downloading installer..."
+      curl -fL --progress-bar -o uos-server "$INSTALLER_URL"
+
+      echo "Verifying binary..."
+      file uos-server
+
+      echo "Making executable..."
+      chmod +x uos-server
+
+      echo "Running installer..."
+      sudo ./uos-server
+
+      echo ""
+      echo "=== UniFi OS Server installed ==="
+      echo "Access: https://$(hostname -I | awk '{print $1}'):11443"
+      echo "Log files: journalctl -u uosserver -f"
+      echo ""
+      echo "To restore backup:"
+      echo "  1. Copy .unifi backup file to /tmp/"
+      echo "  2. Open https://<ip>:11443 in browser"
+      echo "  3. Select 'Restore from backup' during wizard"
+      echo ""
+      echo "CLI management:"
+      echo "  uosserver status"
+      echo "  uosserver restart"
+      echo "  uosserver upgrade"
+    permissions: "0755"
+
+runcmd:
+  - systemctl enable --now qemu-guest-agent
+  - echo "UniFi OS VM ready. Run: /usr/local/bin/install-unifi.sh <installer_url>"
+  - echo "Setup date: $(date)" > /etc/vm-deploy-date
+
+final_message: "UniFi OS VM booted. SSH in as homelab, then run /usr/local/bin/install-unifi.sh"

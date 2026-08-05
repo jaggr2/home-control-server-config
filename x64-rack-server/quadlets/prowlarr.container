@@ -1,0 +1,18 @@
+# renovate: depName=linuxserver/prowlarr datasource=docker
+[Unit]
+Description=Prowlarr Indexer Manager
+After=arr.network
+
+[Container]
+Image=docker.io/linuxserver/prowlarr:1.33.3
+ContainerName=prowlarr
+PublishPort=9696:9696
+Network=arr.network
+Volume=%h/config/prowlarr:/config:Z
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Zurich
+AutoUpdate=registry
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,22 @@
+# renovate: depName=linuxserver/plex datasource=docker
+[Unit]
+Description=Plex Media Server
+After=arr.network
+
+[Container]
+Image=docker.io/linuxserver/plex:1.42.0
+ContainerName=plex
+PublishPort=32400:32400
+Network=arr.network
+Volume=%h/config/plex:/config:Z
+Volume=/mnt/nas/media/tv:/tv:ro,z
+Volume=/mnt/nas/media/movies:/movies:ro,z
+Volume=/mnt/nas/media/music:/music:ro,z
+Environment=PLEX_CLAIM=${PLEX_CLAIM_TOKEN}
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Zurich
+AutoUpdate=registry
+
+[Install]
+WantedBy=default.target

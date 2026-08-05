@@ -1,0 +1,20 @@
+# renovate: depName=linuxserver/sabnzbd datasource=docker
+[Unit]
+Description=SABnzbd Usenet Downloader
+After=arr.network
+
+[Container]
+Image=docker.io/linuxserver/sabnzbd:4.5.1
+ContainerName=sabnzbd
+PublishPort=8080:8080
+Network=arr.network
+Volume=%h/config/sabnzbd:/config:Z
+Volume=/mnt/nas/downloads:/downloads:z
+Volume=/mnt/nas/downloads/incomplete:/incomplete-downloads:z
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Zurich
+AutoUpdate=registry
+
+[Install]
+WantedBy=default.target

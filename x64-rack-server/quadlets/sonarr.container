@@ -1,0 +1,21 @@
+# renovate: depName=linuxserver/sonarr datasource=docker
+[Unit]
+Description=Sonarr TV Series Automation
+After=arr.network
+After=sabnzbd.service
+
+[Container]
+Image=docker.io/linuxserver/sonarr:4.0.14
+ContainerName=sonarr
+PublishPort=8989:8989
+Network=arr.network
+Volume=%h/config/sonarr:/config:Z
+Volume=/mnt/nas/media/tv:/tv:z
+Volume=/mnt/nas/downloads:/downloads:z
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Zurich
+AutoUpdate=registry
+
+[Install]
+WantedBy=default.target

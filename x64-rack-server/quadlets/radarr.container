@@ -1,0 +1,21 @@
+# renovate: depName=linuxserver/radarr datasource=docker
+[Unit]
+Description=Radarr Movie Automation
+After=arr.network
+After=sabnzbd.service
+
+[Container]
+Image=docker.io/linuxserver/radarr:5.20.3
+ContainerName=radarr
+PublishPort=7878:7878
+Network=arr.network
+Volume=%h/config/radarr:/config:Z
+Volume=/mnt/nas/media/movies:/movies:z
+Volume=/mnt/nas/downloads:/downloads:z
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Zurich
+AutoUpdate=registry
+
+[Install]
+WantedBy=default.target

@@ -1,11 +1,9 @@
-# .github/workflows/capture-apt-packages.yml
 name: Capture Apt Packages
 
 on:
   schedule:
-    # Run weekly on Sunday at 3am
     - cron: '0 2 * * 0'
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   capture:
@@ -14,52 +12,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}  # Use token with push access
+          token: ${{ secrets.RENOVATE_TOKEN }}
 
-      - name: Capture apt packages from remote server
+      - name: Capture from ARM device
+        continue-on-error: true
         run: |
-            http_code=$(curl -s -w "%{http_code}" \
-                --max-time 120 \
-                -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
-                -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
-                -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
-                -H "X-Hook-Mode: chunked" \
-                -o apt-packages.txt \
-                "https://derog-hc-deploy.jaggi.xyz/capture-packages.sh?run_id=${{ github.run_id }}")
+          http_code=$(curl -s -w "%{http_code}" \
+            --max-time 120 \
+            -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
+            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
+            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+            -H "X-Hook-Mode: chunked" \
+            -o arm-n2-odroid/apt-packages.txt \
+            "https://derog-hc-deploy.jaggi.xyz/capture-packages.sh?run_id=${{ github.run_id }}")
 
-            if [ "$http_code" -ne 200 ]; then
-                echo "❌ Failed to capture packages (HTTP $http_code)"
-                cat apt-packages.txt
-                exit 1
-            fi
+          echo "ARM capture: HTTP $http_code ($(wc -l < arm-n2-odroid/apt-packages.txt) lines)"
 
-            if [ ! -s apt-packages.txt ]; then
-                echo "❌ Empty response"
-                exit 1
-            fi
-
-            echo "✅ Successfully captured $(wc -l < apt-packages.txt) lines"
-
-      - name: Check for changes
-        id: changes
+      - name: Capture from x64 device
+        continue-on-error: true
         run: |
-          if git diff --quiet apt-packages.txt 2>/dev/null; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No changes detected"
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "📦 Changes detected in apt-packages.txt"
-            git diff apt-packages.txt || true
-          fi
+          http_code=$(curl -s -w "%{http_code}" \
+            --max-time 120 \
+            -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
+            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
+            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+            -H "X-Hook-Mode: chunked" \
+            -o x64-rack-server/apt-packages.txt \
+            "https://derog-rack-deploy.jaggi.xyz/capture-packages.sh?run_id=${{ github.run_id }}")
+
+          echo "x64 capture: HTTP $http_code ($(wc -l < x64-rack-server/apt-packages.txt) lines)"
 
       - name: Commit and push changes
-        if: steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add apt-packages.txt
-          git commit -m "chore: update apt-packages.txt [skip ci]"
+          if git diff --quiet; then
+            echo "No changes detected."
+            exit 0
+          fi
+
+          git add arm-n2-odroid/apt-packages.txt x64-rack-server/apt-packages.txt
+          git commit -m "chore: update apt-packages.txt from devices [skip ci]"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.RENOVATE_TOKEN }}

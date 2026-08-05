@@ -1,0 +1,49 @@
+# Apt Packages - Generated (run capture-packages.sh on host)
+# System: trixie / amd64
+# Managed by Renovate
+
+# Core system packages (will be populated by capture-packages.sh)
+# renovate: depName=podman registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+podman=5.4.1-1
+
+# renovate: depName=qemu-kvm registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# qemu-kvm
+
+# renovate: depName=libvirt-daemon-system registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# libvirt-daemon-system
+
+# renovate: depName=zfsutils-linux registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# zfsutils-linux
+
+# renovate: depName=curl registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# curl
+
+# renovate: depName=git registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# git
+
+# renovate: depName=htop registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# htop
+
+# renovate: depName=jq registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# jq
+
+# renovate: depName=rsync registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# rsync
+
+# renovate: depName=rclone registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# rclone
+
+# renovate: depName=tpm2-tools registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# tpm2-tools
+
+# renovate: depName=clevis-tpm2 registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# clevis-tpm2
+
+# renovate: depName=clevis-luks registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# clevis-luks
+
+# renovate: depName=clevis-initramfs registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# clevis-initramfs
+
+# renovate: depName=samba registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+# samba

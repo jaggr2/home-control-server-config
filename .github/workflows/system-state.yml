@@ -6,13 +6,23 @@ on:
     - cron: '0 2 * * 0'
 
 jobs:
-  deploy:
+  capture:
     runs-on: ubuntu-latest
-    if: always()
+    strategy:
+      matrix:
+        device:
+          - name: arm-n2-odroid
+            url: https://derog-hc-deploy.jaggi.xyz
+          - name: x64-rack-server
+            url: https://derog-rack-deploy.jaggi.xyz
     steps:
-      - name: Get device state via Cloudflare Tunnel
+      - name: Get ${{ matrix.device.name }} system state
+        continue-on-error: true
         run: |
-          # Stream to both stdout and capture to file
+          echo "=== ${{ matrix.device.name }} System State ==="
+          echo "Date: $(date)"
+          echo ""
+
           curl -X POST \
             -u "${{ secrets.WEBHOOK_USER }}:${{ secrets.WEBHOOK_PASSWORD }}" \
             -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
@@ -20,10 +30,8 @@ jobs:
             --no-progress-meter \
             --retry 3 \
             --retry-delay 5 \
-            "https://derog-hc-deploy.jaggi.xyz/ps.sh?run_id=${{ github.run_id }}&repo=${{ github.repository }}&sha=${{ github.sha }}" \
-            | tee /tmp/webhook_response.txt
+            "${{ matrix.device.url }}/ps.sh?run_id=${{ github.run_id }}" \
+            | tee "/tmp/${{ matrix.device.name }}-state.txt"
 
-          echo " "
-          echo "----- Webhookd request completed ------"
-          echo " "
-
+          echo ""
+          echo "=== State captured to /tmp/${{ matrix.device.name }}-state.txt ==="
