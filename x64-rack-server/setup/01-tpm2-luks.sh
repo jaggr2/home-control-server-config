@@ -61,16 +61,21 @@ echo "=== Current LUKS keyslots ==="
 sudo cryptsetup luksDump "${LUKS_DEV}" | grep -E "Slot [0-9]" || true
 
 # ============================================================
-# 5. Bind TPM2 to LUKS
+# 5. Bind TPM2 to LUKS (clevis preferred — works with Debian initramfs)
 # ============================================================
-echo "=== Binding TPM2 (PCR 0+7) ==="
-if sudo cryptsetup luksDump "${LUKS_DEV}" | grep -q "systemd-tpm2"; then
-    echo "  TPM2 token already present, skipping."
+echo "=== Binding TPM2 (PCR 0+7) via clevis ==="
+if sudo clevis luks list -d "${LUKS_DEV}" 2>/dev/null | grep -q "tpm2"; then
+    echo "  Clevis TPM2 binding already exists, skipping."
 else
-    # Use systemd-cryptenroll: keeps existing passphrase slot, adds TPM2 slot.
-    # - --tpm2-device=auto --tpm2-pcrs=0,7 (note: PCR 7 requires Secure Boot stable)
-    sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0,7 "${LUKS_DEV}"
-    echo "  TPM2 bound via systemd-cryptenroll."
+    # Remove any systemd-tpm2 token first (not honored by Debian initramfs-tools)
+    if sudo cryptsetup luksDump "${LUKS_DEV}" | grep -q "systemd-tpm2"; then
+        echo "  Removing systemd-tpm2 token (clevis is the supported path on Debian)..."
+        TOKEN_ID=$(sudo cryptsetup luksDump "${LUKS_DEV}" | awk '/Tokens:/{f=1;next} f&&/systemd-tpm2/{gsub(":","",$1); print $1; exit}')
+        [ -n "$TOKEN_ID" ] && sudo cryptsetup token remove --token-id "$TOKEN_ID" "${LUKS_DEV}"
+    fi
+    # Clevis bind prompts for the existing LUKS passphrase interactively.
+    sudo clevis luks bind -d "${LUKS_DEV}" tpm2 '{"pcr_ids":"0,7"}'
+    echo "  TPM2 bound via clevis."
 fi
 
 # ============================================================
@@ -84,7 +89,8 @@ sudo update-initramfs -u -k all
 # ============================================================
 echo ""
 echo "=== Verify LUKS tokens ==="
-sudo cryptsetup luksDump "${LUKS_DEV}" | grep -E "systemd-tpm2|Token [0-9]|Slot [0-9]" || true
+sudo cryptsetup luksDump "${LUKS_DEV}" | grep -E "clevis|systemd-tpm2|Token [0-9]|Slot [0-9]" || true
+sudo clevis luks list -d "${LUKS_DEV}" || true
 
 echo ""
 echo "=== TPM2-LUKS setup complete ==="
