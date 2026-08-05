@@ -67,7 +67,7 @@ systemctl enable --now libvirtd
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LIBVIRT_DIR="${SCRIPT_DIR}/libvirt"
 
-for net in trusted mgmt iot ai; do
+for net in trusted mgmt iot ai unifi; do
     if [ -f "${LIBVIRT_DIR}/${net}.xml" ]; then
         cp "${LIBVIRT_DIR}/${net}.xml" "/etc/libvirt/qemu/networks/${net}.xml"
     else
@@ -83,7 +83,7 @@ echo ""
 echo "=== KVM networking configured ==="
 echo "Bridge: br0 (VLAN-aware, host IP on br0)"
 echo "Physical NIC: ${PHYSICAL_IFACE} enslaved to br0"
-echo "libvirt networks (VMs attach to br0, tagged): trusted(vlan1), mgmt(vlan11), iot(vlan20), ai(vlan30)"
+echo "libvirt networks (VMs attach to br0, tagged): trusted(vlan1), mgmt(vlan11), iot(vlan20), ai(vlan30), unifi(vlan10)"
 echo ""
 echo "To apply: reboot, or:"
 echo "  sudo ifdown ${PHYSICAL_IFACE}; sudo ifup br0"

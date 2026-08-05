@@ -1,0 +1,8 @@
+<network>
+  <name>unifi</name>
+  <forward mode='bridge'/>
+  <bridge name='br0'/>
+  <vlan>
+    <tag id='10'/>
+  </vlan>
+</network>

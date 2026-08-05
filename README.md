@@ -58,10 +58,10 @@ apply-config.sh (git pull → daemon-reload → restart)
 > rootless podman quadlets. This is the *only* non-container service on the host.
 
 ### KVM Virtual Machines
-| VM | Purpose | vCPU/RAM | VLAN |
-|----|---------|----------|------|
-| unifi-os | UniFi OS Server | 2/2G | Trusted(1) → mgmt(11) |
-| ha-os | Home Assistant OS | 2/4G | Trusted(1) + IoT(20) |
+| VM | Purpose | vCPU/RAM | IP | Network |
+|----|---------|----------|-----|---------|
+| unifi-os | UniFi OS Server | 2/2G | 192.168.10.8 (static) | unifi (vlan 10) |
+| ha-os | Home Assistant OS | 2/4G | DHCP | trusted (vlan 1) + iot (vlan 20) |
 
 ## Backup (3-Tier)
 
