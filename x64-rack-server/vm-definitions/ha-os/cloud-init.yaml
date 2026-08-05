@@ -16,12 +16,17 @@
 #     --memory 4096 \
 #     --vcpus 2 \
 #     --disk path=/var/lib/libvirt/images/ha-os/haos.qcow2,format=qcow2,bus=virtio \
-#     --network bridge=br0.1,model=virtio \
+#     --network network=trusted,model=virtio \
 #     --graphics none \
 #     --console pty,target_type=serial \
 #     --os-variant linux2022 \
 #     --import \
+#     --boot uefi \
 #     --noautoconsole
+#
+# CRITICAL: HA OS REQUIRES UEFI (OVMF) to boot. Without --boot uefi the VM
+# boots in legacy BIOS mode, never initializes the network, and gets no DHCP.
+# Use non-secure OVMF (do NOT enable Secure Boot — HA OS is not MS-signed).
 #
 # Post-boot:
 #   - Access: http://<vm-ip>:8123

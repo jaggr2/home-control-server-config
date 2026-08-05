@@ -166,6 +166,7 @@ else
         --console pty,target_type=serial \
         --os-variant linux2022 \
         --import \
+        --boot uefi \
         --noautoconsole
 fi
 
