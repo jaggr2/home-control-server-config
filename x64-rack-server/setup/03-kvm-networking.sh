@@ -44,6 +44,7 @@ echo "=== Creating VLAN-aware bridge br0 ==="
 cat > "/etc/network/interfaces.d/br0" << EOF
 # VLAN-aware bridge for KVM VMs
 # Host IP is on br0 (untagged). VMs get tagged VLANs via libvirt.
+# bridge_vids: VLANs trunked out ${PHYSICAL_IFACE} (1=native/untagged, 10,11,20,30 tagged)
 auto br0
 iface br0 inet static
     address ${CURRENT_IP}
@@ -53,6 +54,7 @@ iface br0 inet static
     bridge_stp off
     bridge_fd 0
     bridge_vlan_aware yes
+    bridge_vids 1 10 11 20 30
 EOF
 
 echo "  Bridge config written to /etc/network/interfaces.d/br0"
