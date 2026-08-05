@@ -36,4 +36,10 @@ if id -u "$USERNAME" &>/dev/null; then
     su - "$USERNAME" -c "systemctl --user enable podman-auto-update.timer"
 fi
 
+echo ""
+echo "=== Allowing rootless containers to bind low ports (Samba 139/445) ==="
+echo "net.ipv4.ip_unprivileged_port_start=80" | sudo tee /etc/sysctl.d/99-unprivileged-ports.conf >/dev/null
+sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80 >/dev/null
+echo "  net.ipv4.ip_unprivileged_port_start=80 applied (persists via /etc/sysctl.d/)"
+
 echo "Done."
