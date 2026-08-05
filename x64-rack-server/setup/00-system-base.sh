@@ -69,6 +69,17 @@ echo "  Static IP written. Apply with: sudo ifdown ${IFACE} && sudo ifup ${IFACE
 echo "  (This will disconnect you — reconnect to the new IP.)"
 
 # ============================================================
+# 4b. DNS persistence (static resolv.conf)
+# ifupdown's dns-nameservers is only applied via resolvconf, which is
+# not installed on minimal Debian. Write resolv.conf directly + make it
+# immutable so nothing (dhcpcd, systemd-resolved) can clobber it.
+# ============================================================
+echo "=== Ensuring static DNS ==="
+printf "nameserver %s\nnameserver %s\n" "${DNS1}" "${DNS2}" | sudo tee /etc/resolv.conf >/dev/null
+sudo chattr +i /etc/resolv.conf 2>/dev/null || true
+echo "  resolv.conf written (immutable): ${DNS1}, ${DNS2}"
+
+# ============================================================
 # 5. SSH hardening
 # ============================================================
 echo "=== Hardening SSH ==="

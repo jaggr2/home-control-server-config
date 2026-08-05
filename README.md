@@ -71,6 +71,25 @@ apply-config.sh (git pull → daemon-reload → restart)
 | T2 | Udev-triggered external USB | Monthly | 5TB disk (tresor) |
 | T3 | rclone encrypted | Weekly Sun 4am | Cloud offsite |
 
+## Disk / LVM Layout (2TB NVMe)
+
+```
+nvme0n1
+├── p1  976M   /boot/efi
+├── p2  977M   /boot
+└── p3  1.8T   LUKS (TPM2 auto-unlock)
+    └── derog-server-vg
+        ├── root          100G    /
+        ├── containers    200G    /var/lib/containers   (podman storage)
+        ├── libvirt       1.49T   /var/lib/libvirt      (VM images)
+        ├── swap_1        31G     [SWAP]
+        └── (headroom)    ~100G   free in VG
+```
+
+> `/tmp` intentionally stays **tmpfs** (RAM). If the LVM layout ever needs
+> changing, use `setup/rescue-repartition.sh` from Debian rescue mode
+> (Advanced → Rescue mode → shell in installer env → run the script).
+
 ## Rack Server Setup Order
 
 Run on a fresh Debian 13 netinst (as the primary user):
