@@ -10,8 +10,6 @@ Network=host
 Volume=%h/config/cloudflared:/home/nonroot/.cloudflared:Z
 EnvironmentFile=%h/config/quadlets.env
 # TUNNEL_TOKEN is provided via quadlets.env (cloudflared reads it directly)
-# cloudflared natively supports sd_notify — let it signal READY itself
-Notify=true
 AutoUpdate=registry
 
 [Service]
