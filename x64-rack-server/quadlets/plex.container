@@ -13,7 +13,7 @@ Volume=/mnt/nas/media/tv:/tv:ro,z
 Volume=/mnt/nas/media/movies:/movies:ro,z
 Volume=/mnt/nas/media/music:/music:ro,z
 EnvironmentFile=%h/config/quadlets.env
-Environment=PLEX_CLAIM=${PLEX_CLAIM}
+# PLEX_CLAIM is provided via quadlets.env (remove after first claim)
 Environment=PUID=1000
 Environment=PGID=1000
 Environment=TZ=Europe/Zurich

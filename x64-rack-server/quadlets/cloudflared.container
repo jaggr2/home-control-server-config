@@ -9,7 +9,7 @@ ContainerName=cloudflared
 Network=host
 Volume=%h/config/cloudflared:/home/nonroot/.cloudflared:Z
 EnvironmentFile=%h/config/quadlets.env
-Environment=TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+# TUNNEL_TOKEN is provided via quadlets.env (cloudflared reads it directly)
 AutoUpdate=registry
 
 [Service]
