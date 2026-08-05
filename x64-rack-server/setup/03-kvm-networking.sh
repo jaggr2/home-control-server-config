@@ -57,62 +57,23 @@ EOF
 
 echo "  Bridge config written to /etc/network/interfaces.d/br0"
 
-# ============================================================
-# Create VLAN subinterfaces for libvirt VMs
-# ============================================================
-echo "=== Creating VLAN subinterfaces for libvirt ==="
-cat >> "/etc/network/interfaces.d/br0" << 'VLANEOF'
-
-# VLAN subinterfaces for libvirt VMs (no IP on these)
-auto br0.1
-iface br0.1 inet manual
-
-auto br0.11
-iface br0.11 inet manual
-
-auto br0.20
-iface br0.20 inet manual
-
-auto br0.30
-iface br0.30 inet manual
-VLANEOF
-
 echo "=== Configuring libvirt networks ==="
 systemctl enable --now libvirtd
 
-cat > /etc/libvirt/qemu/networks/trusted.xml << 'EOF'
-<network>
-  <name>trusted</name>
-  <forward mode="bridge"/>
-  <bridge name="br0.1"/>
-</network>
-EOF
-
-cat > /etc/libvirt/qemu/networks/mgmt.xml << 'EOF'
-<network>
-  <name>mgmt</name>
-  <forward mode="bridge"/>
-  <bridge name="br0.11"/>
-</network>
-EOF
-
-cat > /etc/libvirt/qemu/networks/iot.xml << 'EOF'
-<network>
-  <name>iot</name>
-  <forward mode="bridge"/>
-  <bridge name="br0.20"/>
-</network>
-EOF
-
-cat > /etc/libvirt/qemu/networks/ai.xml << 'EOF'
-<network>
-  <name>ai</name>
-  <forward mode="bridge"/>
-  <bridge name="br0.30"/>
-</network>
-EOF
+# libvirt bridges each VM to br0 (VLAN-aware) with a native <vlan> tag.
+# This is the supported way — VMs connect to br0 and libvirt tags their
+# vnet ports with the correct VLAN. (VLAN subinterfaces like br0.1 cannot
+# accept bridge ports, so they are NOT used.)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LIBVIRT_DIR="${SCRIPT_DIR}/libvirt"
 
 for net in trusted mgmt iot ai; do
+    if [ -f "${LIBVIRT_DIR}/${net}.xml" ]; then
+        cp "${LIBVIRT_DIR}/${net}.xml" "/etc/libvirt/qemu/networks/${net}.xml"
+    else
+        echo "  WARNING: ${LIBVIRT_DIR}/${net}.xml not found, skipping."
+        continue
+    fi
     virsh net-define "/etc/libvirt/qemu/networks/${net}.xml" 2>/dev/null || true
     virsh net-autostart "${net}" 2>/dev/null || true
     virsh net-start "${net}" 2>/dev/null || true
@@ -122,7 +83,7 @@ echo ""
 echo "=== KVM networking configured ==="
 echo "Bridge: br0 (VLAN-aware, host IP on br0)"
 echo "Physical NIC: ${PHYSICAL_IFACE} enslaved to br0"
-echo "VLAN sub-interfaces: br0.1 (vlan 1), br0.11 (vlan 11), br0.20 (vlan 20), br0.30 (vlan 30)"
+echo "libvirt networks (VMs attach to br0, tagged): trusted(vlan1), mgmt(vlan11), iot(vlan20), ai(vlan30)"
 echo ""
 echo "To apply: reboot, or:"
 echo "  sudo ifdown ${PHYSICAL_IFACE}; sudo ifup br0"

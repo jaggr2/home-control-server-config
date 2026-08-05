@@ -1,0 +1,8 @@
+<network>
+  <name>ai</name>
+  <forward mode='bridge'/>
+  <bridge name='br0'/>
+  <vlan>
+    <tag id='30'/>
+  </vlan>
+</network>

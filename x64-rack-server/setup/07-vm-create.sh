@@ -9,18 +9,27 @@ DEF_DIR="${SCRIPT_DIR}/../vm-definitions"
 USERNAME="${SUDO_USER:-$USER}"
 SSH_PUBKEY="${SSH_PUBLIC_KEY:-}"
 
-echo "=== Creating VM storage directories ==="
-mkdir -p "${VM_DIR}/unifi-os" "${VM_DIR}/ha-os"
-
+# When run via sudo, SUDO_USER is the invoking user (roger).
+# Use their SSH key, not root's.
+if [ -z "$SSH_PUBKEY" ] && [ -n "$SUDO_USER" ]; then
+    if [ -f "/home/${SUDO_USER}/.ssh/id_ed25519.pub" ]; then
+        SSH_PUBKEY=$(cat "/home/${SUDO_USER}/.ssh/id_ed25519.pub")
+    elif [ -f "/home/${SUDO_USER}/.ssh/id_rsa.pub" ]; then
+        SSH_PUBKEY=$(cat "/home/${SUDO_USER}/.ssh/id_rsa.pub")
+    fi
+fi
 if [ -z "$SSH_PUBKEY" ]; then
     if [ -f "/home/${USERNAME}/.ssh/id_ed25519.pub" ]; then
         SSH_PUBKEY=$(cat "/home/${USERNAME}/.ssh/id_ed25519.pub")
     elif [ -f "/home/${USERNAME}/.ssh/id_rsa.pub" ]; then
         SSH_PUBKEY=$(cat "/home/${USERNAME}/.ssh/id_rsa.pub")
     else
-        echo "WARNING: No SSH public key found. Cloud-init will use password auth."
+        echo "WARNING: No SSH public key found. VM only accessible via console."
     fi
 fi
+
+echo "=== Creating VM storage directories ==="
+mkdir -p "${VM_DIR}/unifi-os" "${VM_DIR}/ha-os"
 
 # ============================================================
 # VM 1: UniFi OS Server (Ubuntu 24.04 + UniFi OS Server installer)
@@ -74,7 +83,7 @@ else
         --memory 2048 \
         --vcpus 2 \
         --disk "path=${UNIFI_VM_DIR}/os.qcow2,format=qcow2,bus=virtio" \
-        --network bridge:br0.1,model=virtio \
+        --network network=trusted,model=virtio \
         --graphics none \
         --console pty,target_type=serial \
         --os-variant ubuntu24.04 \
@@ -88,7 +97,7 @@ fi
 echo ""
 echo "UniFi OS VM: ${UNIFI_NAME}"
 echo "  Memory: 2 GB | vCPUs: 2 | Disk: 32 GB"
-echo "  Network: br0.1 (VLAN 1 — Trusted)"
+echo "  Network: trusted (VLAN 1 — via libvirt network on br0)"
 echo "  SSH:   ssh homelab@<vm-ip>"
 echo ""
 echo "  To install UniFi OS Server after VM boots:"
@@ -147,7 +156,7 @@ else
         --memory 4096 \
         --vcpus 2 \
         --disk "path=${HA_VM_DIR}/haos.qcow2,format=qcow2,bus=virtio" \
-        --network bridge:br0.1,model=virtio \
+        --network network=trusted,model=virtio \
         --graphics none \
         --console pty,target_type=serial \
         --os-variant linux2022 \
@@ -158,11 +167,11 @@ fi
 echo ""
 echo "HA OS VM: ${HA_NAME}"
 echo "  Memory: 4 GB | vCPUs: 2 | Disk: 32 GB"
-echo "  Network: br0.1 (VLAN 1 — Trusted)"
+echo "  Network: trusted (VLAN 1 — via libvirt network on br0)"
 echo "  Access: http://<vm-ip>:8123"
 echo ""
 echo "  After first boot, add IoT VLAN access:"
-echo "    virsh attach-interface ha-os bridge br0.20 --model virtio --persistent"
+echo "    virsh attach-interface ha-os network iot --model virtio --persistent"
 echo "    virsh reboot ha-os"
 echo "  Then configure static IP on 192.168.20.x subnet in HA UI"
 echo ""

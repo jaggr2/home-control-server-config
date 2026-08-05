@@ -1,0 +1,8 @@
+<network>
+  <name>iot</name>
+  <forward mode='bridge'/>
+  <bridge name='br0'/>
+  <vlan>
+    <tag id='20'/>
+  </vlan>
+</network>
