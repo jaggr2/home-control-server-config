@@ -4,7 +4,7 @@ Description=Prowlarr Indexer Manager
 After=arr.network
 
 [Container]
-Image=docker.io/linuxserver/prowlarr:2.6.1
+Image=docker.io/linuxserver/prowlarr:2.5.2
 ContainerName=prowlarr
 PublishPort=9696:9696
 Network=arr.network

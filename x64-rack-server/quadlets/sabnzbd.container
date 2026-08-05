@@ -6,7 +6,7 @@ After=arr.network
 [Container]
 Image=docker.io/linuxserver/sabnzbd:5.0.4
 ContainerName=sabnzbd
-PublishPort=8080:8080
+PublishPort=8081:8080
 Network=arr.network
 Volume=%h/config/sabnzbd:/config:Z
 Volume=/mnt/nas/downloads:/downloads:z
