@@ -12,7 +12,8 @@ Volume=%h/config/plex:/config:Z
 Volume=/mnt/nas/media/tv:/tv:ro,z
 Volume=/mnt/nas/media/movies:/movies:ro,z
 Volume=/mnt/nas/media/music:/music:ro,z
-Environment=PLEX_CLAIM=${PLEX_CLAIM_TOKEN}
+EnvironmentFile=%h/config/quadlets.env
+Environment=PLEX_CLAIM=${PLEX_CLAIM}
 Environment=PUID=1000
 Environment=PGID=1000
 Environment=TZ=Europe/Zurich

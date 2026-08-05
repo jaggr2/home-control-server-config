@@ -9,7 +9,8 @@ ContainerName=samba
 Network=host
 Volume=/mnt/nas/shared:/shared:z
 Volume=/mnt/nas/media:/media:ro,z
-Environment=USER=homelab;${SAMBA_PASSWORD:-changeme}
+EnvironmentFile=%h/config/quadlets.env
+Environment=USER=${SAMBA_CREDS}
 Environment=SHARE=shared;/shared;yes;no;no;homelab
 Environment=SHARE2=media;/media;yes;no;yes
 Environment=WORKGROUP=WORKGROUP

@@ -1,17 +1,28 @@
 #!/bin/bash
-# 04-quadlet-deploy.sh — Symlink quadlets + deploy all containers
+# 06-quadlet-deploy.sh — Symlink quadlets + deploy all containers
 set -euo pipefail
 
 REPO_DIR="/opt/homelab"
-QUADLET_DIR="${REPO_DIR}/quadlets"
+QUADLET_DIR="${REPO_DIR}/x64-rack-server/quadlets"
 USERNAME="${SUDO_USER:-$USER}"
 SYSTEMD_DIR="/home/${USERNAME}/.config/containers/systemd"
+CONFIG_DIR="/home/${USERNAME}/config"
 
 echo "=== Creating config directories ==="
 for svc in sabnzbd sonarr radarr prowlarr plex cloudflared; do
-    mkdir -p "/home/${USERNAME}/config/${svc}"
-    chown -R "${USERNAME}:${USERNAME}" "/home/${USERNAME}/config/${svc}"
+    mkdir -p "${CONFIG_DIR}/${svc}"
+    chown -R "${USERNAME}:${USERNAME}" "${CONFIG_DIR}/${svc}"
 done
+
+echo "=== Creating quadlets.env ==="
+if [ ! -f "${CONFIG_DIR}/quadlets.env" ]; then
+    cp "${REPO_DIR}/x64-rack-server/.env.example" "${CONFIG_DIR}/quadlets.env"
+    chown "${USERNAME}:${USERNAME}" "${CONFIG_DIR}/quadlets.env"
+    chmod 600 "${CONFIG_DIR}/quadlets.env"
+    echo "  Created ${CONFIG_DIR}/quadlets.env from example."
+    echo "  >>> EDIT THIS FILE with real values before starting containers!"
+    echo "  >>> nano ${CONFIG_DIR}/quadlets.env"
+fi
 
 echo "=== Symlinking Quadlet files ==="
 for file in "${QUADLET_DIR}"/*; do
