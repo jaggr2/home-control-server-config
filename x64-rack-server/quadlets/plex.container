@@ -4,7 +4,7 @@ Description=Plex Media Server
 After=arr.network
 
 [Container]
-Image=docker.io/linuxserver/plex:1.42.0
+Image=docker.io/linuxserver/plex:1.43.2
 ContainerName=plex
 PublishPort=32400:32400
 Network=arr.network

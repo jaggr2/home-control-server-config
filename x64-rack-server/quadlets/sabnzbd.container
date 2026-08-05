@@ -4,7 +4,7 @@ Description=SABnzbd Usenet Downloader
 After=arr.network
 
 [Container]
-Image=docker.io/linuxserver/sabnzbd:4.5.1
+Image=docker.io/linuxserver/sabnzbd:5.0.4
 ContainerName=sabnzbd
 PublishPort=8080:8080
 Network=arr.network

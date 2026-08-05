@@ -5,7 +5,7 @@ After=arr.network
 After=sabnzbd.service
 
 [Container]
-Image=docker.io/linuxserver/radarr:5.20.3
+Image=docker.io/linuxserver/radarr:6.0.4
 ContainerName=radarr
 PublishPort=7878:7878
 Network=arr.network
