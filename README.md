@@ -147,6 +147,9 @@ cd /opt/homelab/x64-rack-server/setup
 
 ./09-cockpit.sh
 #       -> Cockpit web console + addons (podman, libvirt, storage, network)
+
+./10-cockpit-plugins.sh
+#       -> Third-party plugins: file-sharing, ZFS, cloudflared, explorer, ctop
 ```
 
 ## License
