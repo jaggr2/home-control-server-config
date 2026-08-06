@@ -38,6 +38,6 @@
 #   - Memory: 4 GB (official minimum)
 #   - Disk: 32 GB minimum (includes OS + addons + backups)
 #   - Network: VLAN 1 (Trusted) with access to VLAN 20 (IoT)
-#              Add second NIC for IoT: --network bridge=br0.20,model=virtio
+#              Add second NIC for IoT: --network network=iot,model=virtio
 #   - USB passthrough: Add for Zigbee/Z-Wave dongles, e.g.:
 #     --hostdev 001.003  (from lsusb)

@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - KVM/libvirt installed (setup/03-kvm-networking.sh)
-- VLAN-aware bridge br0 configured
+- Per-VLAN bridges configured (br1/br11/br20/br30)
 - Internet access to download image
 
 ## Initial Setup
@@ -32,7 +32,7 @@ HA OS needs access to both Trusted (VLAN 1) and IoT (VLAN 20) networks.
 Add a second interface after VM creation:
 
 ```bash
-virsh attach-interface ha-os bridge br0.20 --model virtio --persistent
+virsh attach-interface ha-os network iot --model virtio --persistent
 virsh reboot ha-os
 ```
 
@@ -58,7 +58,7 @@ Then configure the IoT interface inside HA:
 - **Updates**: HA OS auto-updates via Supervisor (Settings → System → Updates)
 - **Backups**: Schedule automatic backups to NAS:
   - Settings → System → Backups → Add backup location
-  - Mount NAS path: `\\192.168.1.10\backups\ha-os` or NFS
+  - Mount NAS path: `\\192.168.11.11\backups\ha-os` or NFS
 - **Snapshots**: Pre-update snapshots via Supervisor → Snapshots
 
 ## Troubleshooting

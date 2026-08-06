@@ -124,7 +124,7 @@ cd /opt/homelab/x64-rack-server/setup
 #       -> install ZFS (headers+DKMS), import pool, create datasets
 
 ./03-kvm-networking.sh <iface>
-#       -> KVM/libvirt + VLAN-aware bridge br0 (trusted/mgmt/iot/ai)
+#       -> KVM/libvirt + per-VLAN bridges (br1/br11/br20/br30)
 
 ./04-podman-install.sh
 #       -> podman + rootless lingering + auto-update timer

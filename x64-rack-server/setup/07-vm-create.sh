@@ -1,5 +1,5 @@
 #!/bin/bash
-# 05-vm-create.sh — Create KVM VMs for UniFi OS and Home Assistant OS
+# 07-vm-create.sh — Create KVM VMs for UniFi OS and Home Assistant OS
 # Uses cloud-init definitions from vm-definitions/
 set -euo pipefail
 
@@ -83,7 +83,7 @@ else
         --memory 2048 \
         --vcpus 2 \
         --disk "path=${UNIFI_VM_DIR}/os.qcow2,format=qcow2,bus=virtio" \
-        --network network=trusted,model=virtio \
+        --network network=mgmt,model=virtio \
         --graphics none \
         --console pty,target_type=serial \
         --os-variant ubuntu24.04 \
@@ -97,17 +97,18 @@ fi
 echo ""
 echo "UniFi OS VM: ${UNIFI_NAME}"
 echo "  Memory: 2 GB | vCPUs: 2 | Disk: 32 GB"
-echo "  Network: trusted (VLAN 1 — via libvirt network on br0)"
-echo "  SSH:   ssh homelab@<vm-ip>"
+echo "  Network: mgmt (VLAN 11 — via libvirt network on br11)"
+echo "  Static IP: 192.168.11.8 (set via netplan in cloud-init / offline disk edit)"
+echo "  SSH:   ssh homelab@192.168.11.8"
 echo ""
 echo "  To install UniFi OS Server after VM boots:"
-echo "    ssh homelab@<vm-ip> /usr/local/bin/install-unifi.sh <installer_url>"
+echo "    ssh homelab@192.168.11.8 /usr/local/bin/install-unifi.sh <installer_url>"
 echo "  Get the installer URL from: https://ui.com/download/software/unifi-os-server"
 echo "    (Right-click Linux x64 → Copy link address)"
 echo ""
 echo "  To restore backup after UniFi OS is installed:"
-echo "    1. Copy unifi_os_backup_*.unifi to VM: scp backup.unifi homelab@<vm-ip>:/tmp/"
-echo "    2. Open https://<vm-ip>:11443"
+echo "    1. Copy unifi_os_backup_*.unifi to VM: scp backup.unifi homelab@192.168.11.8:/tmp/"
+echo "    2. Open https://192.168.11.8:11443"
 echo "    3. Select 'Restore from backup' during wizard"
 echo "  Backup file: unifi_os_backup_1785762027534_66c79ac6-86de-4445-a3ad-3dc5e09652d7.unifi"
 echo ""
@@ -173,7 +174,7 @@ fi
 echo ""
 echo "HA OS VM: ${HA_NAME}"
 echo "  Memory: 4 GB | vCPUs: 2 | Disk: 32 GB"
-echo "  Network: trusted (VLAN 1 — via libvirt network on br0)"
+echo "  Network: trusted (VLAN 1 — via libvirt network on br1)"
 echo "  Access: http://<vm-ip>:8123"
 echo ""
 echo "  After first boot, add IoT VLAN access:"

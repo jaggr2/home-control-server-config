@@ -8,8 +8,8 @@ set -euo pipefail
 # ============================================================
 USERNAME="${1:-$USER}"                       # primary user
 HOSTNAME="${2:-derog-rack}"                  # server hostname
-STATIC_IP="${3:-192.168.1.10/24}"            # static IP + prefix
-GATEWAY="${4:-192.168.1.1}"                  # gateway
+STATIC_IP="${3:-192.168.11.11/24}"           # static IP + prefix
+GATEWAY="${4:-192.168.11.1}"                  # gateway (mgmt VLAN 11)
 DNS1="${5:-1.1.1.1}"
 DNS2="${6:-8.8.8.8}"
 IFACE="${7:-enp3s0}"                         # primary NIC (adjust!)
