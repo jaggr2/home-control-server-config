@@ -27,6 +27,9 @@ cockpit-sosreport=337-1+deb13u1
 # renovate: depName=cockpit-packagekit registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
 cockpit-packagekit=337-1+deb13u1
 
+# renovate: depName=pcp registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+pcp=6.3.8-1
+
 # renovate: depName=qemu-kvm registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
 # qemu-kvm
 

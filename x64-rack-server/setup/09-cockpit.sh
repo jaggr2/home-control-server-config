@@ -5,7 +5,7 @@ set -euo pipefail
 
 USERNAME="${SUDO_USER:-$USER}"
 
-echo "=== Installing cockpit + addons ==="
+echo "=== Installing cockpit + addons + PCP ==="
 sudo apt-get install -y -qq \
     cockpit \
     cockpit-podman \
@@ -13,12 +13,18 @@ sudo apt-get install -y -qq \
     cockpit-storaged \
     cockpit-networkmanager \
     cockpit-sosreport \
-    cockpit-packagekit
+    cockpit-packagekit \
+    pcp
 
 echo ""
 echo "=== Enabling cockpit.socket (HTTPS :9090) ==="
 sudo systemctl enable --now cockpit.socket
 systemctl is-active cockpit.socket
+
+echo ""
+echo "=== Enabling PCP metric collection (Cockpit history graphs) ==="
+sudo systemctl enable --now pmcd pmlogger pmproxy
+systemctl is-active pmcd pmlogger pmproxy
 
 echo ""
 echo "=== Opening 9090 in UFW (if present) ==="
