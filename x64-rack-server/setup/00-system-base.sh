@@ -7,7 +7,7 @@ set -euo pipefail
 # Config (adjust as needed)
 # ============================================================
 USERNAME="${1:-$USER}"                       # primary user
-HOSTNAME="${2:-derog-rack}"                  # server hostname
+HOSTNAME="${2:-derog-server}"                  # server hostname
 STATIC_IP="${3:-192.168.11.11/24}"           # static IP + prefix
 GATEWAY="${4:-192.168.11.1}"                  # gateway (mgmt VLAN 11)
 DNS1="${5:-1.1.1.1}"

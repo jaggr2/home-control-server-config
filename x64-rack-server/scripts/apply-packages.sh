@@ -2,7 +2,7 @@
 # apply-packages.sh — Apply pinned package versions from apt-packages.txt
 set -e
 
-PACKAGES_FILE="/opt/homelab/apt-packages.txt"
+PACKAGES_FILE="/opt/homelab/x64-rack-server/apt-packages.txt"
 
 if [ ! -f "$PACKAGES_FILE" ]; then
     echo "Error: ${PACKAGES_FILE} not found"

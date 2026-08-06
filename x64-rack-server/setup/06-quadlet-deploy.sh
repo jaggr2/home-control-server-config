@@ -24,6 +24,23 @@ if [ ! -f "${CONFIG_DIR}/quadlets.env" ]; then
     echo "  >>> nano ${CONFIG_DIR}/quadlets.env"
 fi
 
+echo "=== Provisioning Samba POSIX identity ==="
+# Rootless podman userns: container uid 100 (smbuser) -> host 100099, gid 101 (smb) -> host 100100.
+# dperson/samba force-users smbuser for all SMB writes, so the shares must be
+# writable by that mapped host identity (homelab user/group).
+if ! getent group homelab >/dev/null; then
+    groupadd -g 100100 homelab
+    echo "  group homelab (100100) created"
+fi
+if ! getent passwd homelab >/dev/null; then
+    useradd -u 100099 -g 100100 -s /usr/sbin/nologin -M homelab
+    echo "  user homelab (100099) created"
+fi
+usermod -aG 100100 "${USERNAME}"
+chown -R 100099:100100 /mnt/nas/shared
+chmod -R 2775 /mnt/nas/shared
+echo "  /mnt/nas/shared -> homelab:homelab (2775, setgid)"
+
 echo "=== Symlinking Quadlet files ==="
 for file in "${QUADLET_DIR}"/*; do
     basename=$(basename "$file")

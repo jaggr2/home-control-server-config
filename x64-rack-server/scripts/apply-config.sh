@@ -3,7 +3,8 @@
 set -e
 
 REPO_DIR="/opt/homelab"
-QUADLET_LINK="/home/homelab/.config/containers/systemd"
+# webhookd runs as the podman user (roger); make sure user systemd is reachable
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 
 cd "$REPO_DIR"
 
@@ -31,7 +32,7 @@ echo "Reloading systemd..."
 systemctl --user daemon-reload
 
 echo "Restarting updated services..."
-for file in "$REPO_DIR"/quadlets/*.container; do
+for file in "$REPO_DIR"/x64-rack-server/quadlets/*.container; do
     if [ ! -f "$file" ]; then
         continue
     fi

@@ -56,6 +56,16 @@ zpool status "${POOL}" | head -20
 zpool list "${POOL}"
 
 # ============================================================
+# 3b. Enable all supported pool features (one-way)
+# Pool was created on old Proxmox (ZFS 2.1/2.2 era) — newer
+# features (block_cloning, raidz_expansion, fast_dedup, blake3,
+# longname, ...) stay disabled until 'zpool upgrade' runs.
+# One-way door: after this, ZFS < 2.1 can no longer open the pool.
+# ============================================================
+echo "=== Enabling all supported features (one-way) ==="
+sudo zpool upgrade "${POOL}" || true
+
+# ============================================================
 # 4. Handle stuck resilver (from unclean disconnect on old host)
 # ============================================================
 echo "=== Checking resilver state ==="

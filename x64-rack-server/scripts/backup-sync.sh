@@ -5,6 +5,7 @@ set -e
 ACTION="${1:-tier1}"
 LOG="/var/log/backup-manual.log"
 NAS_BACKUP="/mnt/nas/backups/rack-server"
+RCLONE_SCRIPT="/home/roger/config/backup/rclone-backup.sh"
 
 echo "$(date): Manual backup triggered: ${ACTION}" | tee -a "$LOG"
 
@@ -16,12 +17,12 @@ case "$ACTION" in
         /usr/local/bin/backup-tier2.sh
         ;;
     tier3|offsite)
-        bash /home/homelab/config/backup/rclone-backup.sh
+        bash "${RCLONE_SCRIPT}"
         ;;
     all)
         /usr/local/bin/backup-tier1.sh
         /usr/local/bin/backup-tier2.sh
-        bash /home/homelab/config/backup/rclone-backup.sh
+        bash "${RCLONE_SCRIPT}"
         ;;
     status)
         echo "=== ZFS Snapshots ==="
