@@ -1,8 +1,5 @@
 <network>
   <name>mgmt</name>
   <forward mode='bridge'/>
-  <bridge name='br0'/>
-  <vlan>
-    <tag id='11'/>
-  </vlan>
+  <bridge name='br11'/>
 </network>

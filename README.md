@@ -60,8 +60,25 @@ apply-config.sh (git pull → daemon-reload → restart)
 ### KVM Virtual Machines
 | VM | Purpose | vCPU/RAM | IP | Network |
 |----|---------|----------|-----|---------|
-| unifi-os | UniFi OS Server | 2/2G | 192.168.10.8 (static) | unifi (vlan 10) |
-| ha-os | Home Assistant OS | 2/4G | DHCP | trusted (vlan 1) + iot (vlan 20) |
+| unifi-os | UniFi OS Server | 2/2G | 192.168.11.8 (static) | mgmt (br11, vlan 11) |
+| ha-os | Home Assistant OS | 2/4G | DHCP | trusted (br1, vlan 1) + iot (vlan 20) |
+
+> **Host mgmt**: rack server is on **192.168.11.11** (mgmt, VLAN 11).
+
+## Network Architecture (per-VLAN bridges)
+
+```
+enp3s0 (physical trunk, no IP)
+├── enp3s0.1   → br1    (VLAN 1  / trusted)   [VMs]
+├── enp3s0.11  → br11   (VLAN 11 / mgmt)      [host 192.168.11.11 + VMs]
+├── enp3s0.20  → br20   (VLAN 20 / iot)       [VMs]
+└── enp3s0.30  → br30   (VLAN 30 / ai)        [VMs]
+```
+
+Each VLAN gets a subinterface on the physical NIC + a plain bridge.
+libvirt networks bridge VMs to the per-VLAN bridges.
+> Note: a single VLAN-aware bridge (`bridge_vlan_aware yes`) cannot serve
+> the host IP via a VLAN subinterface — use per-VLAN bridges instead.
 
 ## Backup (3-Tier)
 

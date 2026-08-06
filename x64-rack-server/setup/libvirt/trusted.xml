@@ -1,8 +1,5 @@
 <network>
   <name>trusted</name>
   <forward mode='bridge'/>
-  <bridge name='br0'/>
-  <vlan>
-    <tag id='1' nativeMode='untagged'/>
-  </vlan>
+  <bridge name='br1'/>
 </network>
