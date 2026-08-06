@@ -3,9 +3,12 @@
 # Run after 09-cockpit.sh. Installs:
 #   cockpit-file-sharing (45Drives) — Samba/NFS/iSCSI/S3 mgmt (trixie .deb)
 #   cockpit-zfs (45Drives)         — ZFS pool/dataset/snapshot mgmt (build)
-#   cockpit-cloudflared            — Cloudflare tunnel registration (build)
 #   explorer                       — file manager (no build)
 #   ctop                           — btop-style system monitor (no build)
+#
+# Note: cockpit-cloudflared was tried but removed — it requires a locally
+# managed tunnel (cert.pem); this host uses a token-based (remotely managed)
+# tunnel, so the plugin can't list tunnels and hangs on loading.
 set -euo pipefail
 
 USERNAME="${SUDO_USER:-$USER}"
@@ -40,15 +43,6 @@ else
 fi
 
 echo ""
-echo "=== cockpit-cloudflared (build from source) ==="
-if [ ! -d /usr/local/share/cockpit/cloudflared ]; then
-    git clone -q --depth 1 https://github.com/gbraad-cockpit/cockpit-cloudflared.git "${WORKDIR}/cockpit-cloudflared"
-    (cd "${WORKDIR}/cockpit-cloudflared" && make && sudo make install)
-else
-    echo "  already installed"
-fi
-
-echo ""
 echo "=== explorer (file manager, no build) ==="
 if [ ! -d /usr/share/cockpit/explorer ]; then
     git clone -q --depth 1 https://github.com/ismetozalp/explorer.git "${WORKDIR}/explorer"
@@ -72,7 +66,7 @@ sudo systemctl try-restart cockpit.socket
 
 echo ""
 echo "=== Installed plugins ==="
-cockpit-bridge --packages 2>/dev/null | grep -iE 'cloudflared|ctop|explorer|file-sharing|zfs' || true
+cockpit-bridge --packages 2>/dev/null | grep -iE 'ctop|explorer|file-sharing|zfs' || true
 
 echo ""
 echo "=== Cleanup ==="
