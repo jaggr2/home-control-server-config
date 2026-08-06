@@ -4,7 +4,28 @@
 
 # Core system packages (will be populated by capture-packages.sh)
 # renovate: depName=podman registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
-podman=5.4.1-1
+podman=5.4.2+ds1-2+b2
+
+# renovate: depName=cockpit registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+cockpit=337-1+deb13u1
+
+# renovate: depName=cockpit-podman registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+cockpit-podman=108-1
+
+# renovate: depName=cockpit-machines registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+cockpit-machines=332-1
+
+# renovate: depName=cockpit-storaged registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+cockpit-storaged=337-1+deb13u1
+
+# renovate: depName=cockpit-networkmanager registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+cockpit-networkmanager=337-1+deb13u1
+
+# renovate: depName=cockpit-sosreport registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+cockpit-sosreport=337-1+deb13u1
+
+# renovate: depName=cockpit-packagekit registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
+cockpit-packagekit=337-1+deb13u1
 
 # renovate: depName=qemu-kvm registryUrl=https://deb.debian.org/debian?suite=trixie&components=main&binaryArch=amd64
 # qemu-kvm

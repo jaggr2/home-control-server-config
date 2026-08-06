@@ -53,9 +53,10 @@ apply-config.sh (git pull → daemon-reload → restart)
 | SABnzbd | Usenet downloader |
 | Samba | SMB file sharing |
 
-> **Non-container exception**: **Cloudflared** runs as a native apt/systemd service
+> **Non-container exceptions**: **Cloudflared** runs as a native apt/systemd service
 > (`setup/cloudflared-setup.sh`) because its sd_notify behavior is incompatible with
-> rootless podman quadlets. This is the *only* non-container service on the host.
+> rootless podman quadlets. **Cockpit** (`setup/09-cockpit.sh`) also runs natively —
+> it is a host management console, not a container workload.
 
 ### KVM Virtual Machines
 | VM | Purpose | vCPU/RAM | IP | Network |
@@ -143,6 +144,9 @@ cd /opt/homelab/x64-rack-server/setup
 
 ./08-backup-setup.sh
 #       -> 3-tier backup (ZFS sync + udev USB + rclone)
+
+./09-cockpit.sh
+#       -> Cockpit web console + addons (podman, libvirt, storage, network)
 ```
 
 ## License
