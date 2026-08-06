@@ -106,6 +106,17 @@ echo "  Host mgmt: ${HOST_IP} via ${HOST_GW} on br11"
 echo "=== Configuring libvirt networks ==="
 systemctl enable --now libvirtd
 
+echo "=== Granting user libvirt group access (Cockpit VMs) ==="
+# polkit 60-libvirt.rules allows any user in the 'libvirt' group to manage
+# the system libvirtd without a password — required for cockpit-machines.
+USERNAME="${SUDO_USER:-$USER}"
+if ! id -nG "${USERNAME}" | tr ' ' '\n' | grep -qx libvirt; then
+    usermod -aG libvirt "${USERNAME}"
+    echo "  ${USERNAME} added to libvirt group (re-login required)"
+else
+    echo "  ${USERNAME} already in libvirt group"
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LIBVIRT_DIR="${SCRIPT_DIR}/libvirt"
 
