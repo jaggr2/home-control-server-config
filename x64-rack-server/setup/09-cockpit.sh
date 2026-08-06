@@ -41,6 +41,35 @@ systemctl --user enable --now podman.socket
 systemctl --user is-active podman.socket
 
 echo ""
+echo "=== Granting admin + libvirt group access ==="
+# polkit admin = sudo group (50-default.rules); PackageKit needs it too.
+if ! id -nG "${USERNAME}" | tr ' ' '\n' | grep -qx sudo; then
+    sudo usermod -aG sudo "${USERNAME}"
+    echo "  ${USERNAME} added to sudo group (re-login required)"
+fi
+if ! id -nG "${USERNAME}" | tr ' ' '\n' | grep -qx libvirt; then
+    sudo usermod -aG libvirt "${USERNAME}"
+    echo "  ${USERNAME} added to libvirt group (re-login required)"
+fi
+
+echo ""
+echo "=== Allowing PackageKit for sudo group (Cockpit Software Updates) ==="
+# Debian's packagekit polkit rule only covers upgrade-system/trigger-offline-update,
+# not system-sources-refresh which Cockpit calls as the web user. Without this the
+# Software Updates page fails with "Failed to obtain authentication".
+sudo tee /etc/polkit-1/rules.d/49-packagekit.rules >/dev/null <<'EOF'
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.freedesktop.packagekit.system-sources-refresh" ||
+         action.id == "org.freedesktop.packagekit.upgrade-system" ||
+         action.id == "org.freedesktop.packagekit.trigger-offline-update") &&
+        subject.isInGroup("sudo")) {
+            return polkit.Result.YES;
+    }
+});
+EOF
+sudo systemctl restart polkit
+
+echo ""
 echo "=== Verifying ==="
 podman ps --format 'table {{.Names}}\t{{.Status}}'
 curl -sI http://localhost:9090/ | head -1
